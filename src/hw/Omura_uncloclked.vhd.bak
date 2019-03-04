@@ -113,7 +113,7 @@ ARCHITECTURE rtl OF Omura IS
 					END IF;
 
 				WHEN I1eii =>
-					result <=  S ;
+					result <= S   AND ( shift_left(unsigned(p_i), 1));
 					current_s <= I1n;
 
 				WHEN I1e  =>
