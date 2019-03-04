@@ -85,7 +85,6 @@ architecture rtl of Omura is
 
             when Add => if(doneIn = '1') then
                             next_s <= Shift;
-                            --bufferValues_f <= valueIn & bufferValues_p(9 downto 1);
                             bufferValues_f <= bufferValues_p(8 downto 0) & valueIn ;
                           else
                             next_s <= WaitState;
