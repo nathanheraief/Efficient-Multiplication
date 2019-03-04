@@ -23,10 +23,10 @@ END ENTITY Omura_tb;
 ARCHITECTURE arch OF Omura_tb IS
 
 	COMPONENT Omura
-		generic
-		(
+		 	generic
+			(
 		N : integer:= 577
-		);
+			);
 		PORT (
 			-- Required by CPU
 			clk    : IN std_logic;                     -- CPU system clock (always required)
