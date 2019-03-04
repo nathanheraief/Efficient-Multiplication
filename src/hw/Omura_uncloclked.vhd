@@ -20,7 +20,7 @@ USE IEEE.std_logic_unsigned.ALL;
 ENTITY Omura IS
  	generic
 	(
-	N : integer:= 255
+	N : integer:= 577
 	);
 	PORT (
 		-- Required by CPU
@@ -54,7 +54,7 @@ ARCHITECTURE rtl OF Omura IS
 	SIGNAL T2	     : STD_LOGIC;
 
 	BEGIN
-	
+
 	PROCESS (clk, reset)
 	BEGIN
 		IF (reset = '1') THEN
