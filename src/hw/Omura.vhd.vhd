@@ -20,7 +20,7 @@ USE IEEE.std_logic_unsigned.ALL;
 ENTITY Omura IS
  	generic
 	(
-	N : integer:= 255
+	N : integer:= 577
 	);
 	PORT (
 		-- Required by CPU
@@ -49,16 +49,29 @@ ARCHITECTURE rtl OF Omura IS
 	SIGNAL datab_f       : STD_LOGIC_VECTOR(N DOWNTO 0);
 	SIGNAL S      	     : STD_LOGIC_VECTOR(N DOWNTO 0);
 	SIGNAL Sp            : STD_LOGIC_VECTOR(N DOWNTO 0);
+	SIGNAL pp            : STD_LOGIC_VECTOR(N DOWNTO 0);
 	SIGNAL busy 	     : STD_LOGIC;
 	SIGNAL T1	     : STD_LOGIC;
 	SIGNAL T2	     : STD_LOGIC;
 
 	BEGIN
-	
+
 	PROCESS (clk, reset)
 	BEGIN
 		IF (reset = '1') THEN
-
+		dataa_p <= ( others => '0') ;
+		dataa_f <= ( others => '0') ;
+        datab_p <= ( others => '0') ;
+        datab_f <= ( others => '0') ;
+        S <= ( others => '0') ;
+        Sp <= ( others => '0') ;
+        busy <=  '0' ;
+        result <= ( others => '0') ;
+        done <=  '0' ;
+        T1 <=  '0' ;
+        T2 <=  '0' ;
+        current_s <= Init;
+        
 		ELSIF (rising_edge(clk)) THEN
 
 			CASE current_s IS
@@ -85,8 +98,8 @@ ARCHITECTURE rtl OF Omura IS
 					current_s <= I0n;
 
 				WHEN I0n =>
-					S <=  dataa + datab;
-					IF (S(N + 1) = '1' AND S(N) = '1') THEN
+					S <=  dataa + datab_f;
+					IF ( S(N) = '1') THEN
 						T1 <= '1';
 					END IF;
 					Sp        <= NOT S;
@@ -111,13 +124,14 @@ ARCHITECTURE rtl OF Omura IS
 					ELSE
 						current_s <= I1e;
 					END IF;
+					pp(N-1 DOWNTO 1) <= p_i(N-2 DOWNTO 0);
 
 				WHEN I1eii =>
-					result <= S   AND ( shift_left(unsigned(p_i), 1));
+					result <=  S + ((not pp)+1);
 					current_s <= I1n;
 
 				WHEN I1e  =>
-					result    <= S;
+					result    <= S ;
 					current_s <= I1n;
 
 				WHEN I1n =>
