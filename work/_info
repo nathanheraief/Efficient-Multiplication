@@ -1,0 +1,100 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/Modeltech_pe_edu_10.4a/examples
+Eomura
+Z0 w1551779240
+Z1 DPx4 ieee 15 std_logic_arith 0 22 [G314=:2zXJ`VORJe1J@Z1
+Z2 DPx4 ieee 18 std_logic_unsigned 0 22 ;eZjO2D4ZDz<]0>8AL<ne1
+Z3 DPx4 ieee 11 numeric_std 0 22 :ASDNFgHXf_ih3J@9F3Ze1
+Z4 DPx3 std 6 textio 0 22 zE1`LPoLg^DX3Oz^4Fj1K3
+Z5 DPx4 ieee 14 std_logic_1164 0 22 eNV`TJ_GofJTzYa?f<@Oe1
+Z6 dC:/Users/Shadow/Documents/PE/Efficient-Multiplication
+Z7 8C:/Users/Shadow/Documents/PE/Efficient-Multiplication/src/hw/Omura.vhd.vhd
+Z8 FC:/Users/Shadow/Documents/PE/Efficient-Multiplication/src/hw/Omura.vhd.vhd
+l0
+L20
+V6]6o[YE1UFEm7NR5N@7JV2
+!s100 =`P?03<;2gAP5VYQ`SbdY0
+Z9 OP;C;10.4a;61
+32
+Z10 !s110 1551780046
+!i10b 1
+Z11 !s108 1551780046.000000
+Z12 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Shadow/Documents/PE/Efficient-Multiplication/src/hw/Omura.vhd.vhd|
+Z13 !s107 C:/Users/Shadow/Documents/PE/Efficient-Multiplication/src/hw/Omura.vhd.vhd|
+!i113 1
+Z14 o-work work -2002 -explicit -O0
+Z15 tExplicit 1
+Artl
+R1
+R2
+R3
+R4
+R5
+DEx4 work 5 omura 0 22 6]6o[YE1UFEm7NR5N@7JV2
+l56
+L42
+V0`mTMQm>:eUH4T8YP1dJc3
+!s100 FnNRS8PgG88c<UUGB`WCk2
+R9
+32
+R10
+!i10b 1
+R11
+R12
+R13
+!i113 1
+R14
+R15
+Eomura_tb
+Z16 w1551778648
+R3
+R2
+R1
+R4
+R5
+R6
+Z17 8C:/Users/Shadow/Documents/PE/Efficient-Multiplication/src/hw/Omura_uncloclked_tb.vhd
+Z18 FC:/Users/Shadow/Documents/PE/Efficient-Multiplication/src/hw/Omura_uncloclked_tb.vhd
+l0
+L20
+V:RH[Z1QBc_BOVF8EJGUmK0
+!s100 Co4he`^Kk>gDoc5bCA[>z3
+R9
+32
+R10
+!i10b 1
+R11
+Z19 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Shadow/Documents/PE/Efficient-Multiplication/src/hw/Omura_uncloclked_tb.vhd|
+Z20 !s107 C:/Users/Shadow/Documents/PE/Efficient-Multiplication/src/hw/Omura_uncloclked_tb.vhd|
+!i113 1
+R14
+R15
+Aarch
+R3
+R2
+R1
+R4
+R5
+Z21 DEx4 work 8 omura_tb 0 22 :RH[Z1QBc_BOVF8EJGUmK0
+l62
+L23
+Z22 Vgi5We_c50]O`YOOJ03Fbd1
+Z23 !s100 GGN0f<[]i=VzVE>h3H^iL2
+R9
+32
+R10
+!i10b 1
+R11
+R19
+R20
+!i113 1
+R14
+R15
