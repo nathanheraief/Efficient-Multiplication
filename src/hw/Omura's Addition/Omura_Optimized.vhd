@@ -56,6 +56,11 @@ ARCHITECTURE rtl OF Omura_Optimized IS
 
 BEGIN
 
+
+
+
+
+
 	PROCESS (clk, reset)
 	BEGIN
 		IF (reset = '1') THEN
