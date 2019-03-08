@@ -11,6 +11,7 @@
 --
 ------------------------------------------------------------------------------
 
+
 LIBRARY IEEE;
 USE IEEE.std_logic_11NB_ADD4.ALL;
 USE IEEE.numeric_std.ALL;
@@ -130,11 +131,21 @@ G1 : FOR i IN (NB_ADD-1) DOWNTO 0 GENERATE
 
 				WHEN PRECALCUL =>
           IF(counter = 0) THEN
-            dataa_s(102 DOWNTO 0)   <=
-            dataa_s(205 DOWNTO 103) <=
-            dataa_s(308 DOWNTO 206) <=
-            dataa_s(411 DOWNTO 309) <=
-            dataa_s(515 DOWNTO 412) <=
+            dataa_s(102 DOWNTO 0)   <= dataa(102 DOWNTO 0);   --a0
+            datab_s(102 DOWNTO 0)   <= datab(308 DOWNTO 206); --a2
+
+            dataa_s(205 DOWNTO 103) <= dataa(205 DOWNTO 103); --a1
+            datab_s(205 DOWNTO 103) <= datab(205 DOWNTO 103); --a3
+
+            dataa_s(308 DOWNTO 206) <= dataa(102 DOWNTO 0);   --a0
+            datab_s(308 DOWNTO 206) <= datab(308-4 DOWNTO 206)  & (others => '0'); --a2*2^2
+
+            dataa_s(411 DOWNTO 309) <= dataa(205-2 DOWNTO 103)  & (others => '0'); -- 2a1
+            datab_s(411 DOWNTO 309) <= datab(411-8 DOWNTO 309)  & (others => '0'); --2^3 * a3
+
+            dataa_s(512 DOWNTO 412) <= dataa(102 DOWNTO 0); --a0
+            datab_s(512 DOWNTO 412) <= datab(308-16 DOWNTO 206)  & (others => '0') ; -- 2^4 * a2
+
           END IF;
           IF(counter = 1) THEN
           END IF;
