@@ -1,17 +1,16 @@
 
-
 -------------------------------------------------------------------------------
--- Title : Memory Instruction
--- Project : LogicBrain
+-- Title : Omura_Optimized_tb
+-- Project : Efficient multiplication
 -------------------------------------------------------------------------------
--- File : loadFirstLayerWeight_tb.vhd
--- Author : non renseigne
--- Created : non renseigne
--- Last update: non renseigne
+-- File : Omura_Optimized_tb.vhd
+-- Author : Heraief Nathan
+-- Created : 18 Feb 2019
+-- Last update: 12 Mar 2019
 -------------------------------------------------------------------------------
--- Description:
+-- Description: Testbench for Omura_Optimized_tb
 --
--------------------------------------------------------------------------------
+------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE IEEE.std_logic_1164.ALL;
 USE IEEE.std_logic_arith.ALL;

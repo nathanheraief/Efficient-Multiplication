@@ -29,7 +29,7 @@ ENTITY evaluator IS
 		done   : OUT std_logic; -- Active high signal used to notify the CPU that result is valid (required for variable multi-cycle)
 		dataa  : IN std_logic_vector(N DOWNTO 0); -- Operand A (always required)
 		datab  : IN std_logic_vector(N DOWNTO 0); -- Operand B (optional)
-		result : OUT std_logic_vector(N + 1 DOWNTO 0) -- result (always required)
+		result : OUT std_logic_vector(N DOWNTO 0) -- result (always required)
 
 	);
 END evaluator;
@@ -56,7 +56,7 @@ ARCHITECTURE rtl OF evaluator IS
 
 	COMPONENT Omura_Optimized
 		GENERIC (
-			N : INTEGER := 577
+			N : INTEGER := 103
 		);
 		PORT (
 			-- Required by CPU
@@ -67,12 +67,7 @@ ARCHITECTURE rtl OF evaluator IS
 			done   : OUT std_logic; -- Active high signal used to notify the CPU that result is valid (required for variable multi-cycle)
 			dataa  : IN std_logic_vector(N DOWNTO 0); -- Operand A (always required)
 			datab  : IN std_logic_vector(N DOWNTO 0); -- Operand B (optional)
-			result : OUT std_logic_vector(N + 1 DOWNTO 0); -- result (always required)
-
-			--Custom I/O
-			sub_i : IN std_logic;
-			p_i   : IN std_logic_vector(N - 1 DOWNTO 0);
-			m_i   : IN std_logic_vector(N + 1 DOWNTO 0)
+			result : OUT std_logic_vector(N + 1 DOWNTO 0) -- result (always required)
 		);
 	END COMPONENT;
 
@@ -105,6 +100,7 @@ PROCESS (clk, reset)
 			SP2       <= (OTHERS => '0');
 			SP4       <= (OTHERS => '0');
 			SI4       <= (OTHERS => '0');
+			sub_i_s   <= (OTHERS => '0');
 			busy      <= '0';
 			result    <= (OTHERS => '0');
 			done      <= '0';
@@ -196,18 +192,21 @@ PROCESS (clk, reset)
 						-- Adder 1
 						dataa_s(205 DOWNTO 103) <= result_s(102 DOWNTO 0); -- sp1
 						datab_s(205 DOWNTO 103) <= result_s(205 DOWNTO 103); -- -si1
+						sub_i_s(1) <= '1';
 						--Adder 2
 						dataa_s(308 DOWNTO 206) <= result_s(308 DOWNTO 206); -- sp2
 						datab_s(308 DOWNTO 206) <= result_s(411 DOWNTO 309); -- si2
 						--Adder 3
 						dataa_s(411 DOWNTO 309) <= result_s(308 DOWNTO 206); -- sp2
 						datab_s(411 DOWNTO 309) <= result_s(411 DOWNTO 309); -- -si2
+						sub_i_s(3) <= '1';
 						--Adder 4
 						dataa_s(514 DOWNTO 412) <= result_s(514 DOWNTO 412); --sp4
 						datab_s(514 DOWNTO 412) <= result_s(618 DOWNTO 515); -- si4
 						-- Adder 5
 						dataa_s(618 DOWNTO 515) <= result_s(514 DOWNTO 412); -- sp4
 						datab_s(618 DOWNTO 515) <= result_s(618 DOWNTO 515); -- -si4
+						sub_i_s(5) <= '1';
 
 						start_s <= 1;
 						current_s <= WAIT;
@@ -215,6 +214,8 @@ PROCESS (clk, reset)
 					END IF;
 
 				WHEN CALCUL =>
+					result <= result_s;
+
 
 			END CASE;
 		END IF;
