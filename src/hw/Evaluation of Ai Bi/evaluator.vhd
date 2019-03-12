@@ -56,10 +56,10 @@ ARCHITECTURE rtl OF evaluator IS
 	SIGNAL sub_i_s   : std_logic_vector(NB_ADD - 1 DOWNTO 0);
 	SIGNAL dataa_s   : std_logic_vector(NB_ADD * (N/5) DOWNTO 0);
 	SIGNAL datab_s   : std_logic_vector(NB_ADD * (N/5) DOWNTO 0);
-	SIGNAL result_s  : std_logic_vector(NB_ADD * (N/5) DOWNTO 0);
-	
-	SIGNAL m_i_s     : std_logic_vector(N-1 DOWNTO 0);
-	SIGNAL p_i_s     : std_logic_vector(N+1 DOWNTO 0);
+	SIGNAL result_s  : std_logic_vector(NB_ADD * (N/5 + 1) DOWNTO 0);
+
+	SIGNAL m_i_s     : std_logic_vector(N/5 DOWNTO 0);
+	SIGNAL p_i_s     : std_logic_vector(N/5 - 2 DOWNTO 0);
 
 	COMPONENT Omura_Optimized
 		GENERIC (
@@ -75,7 +75,7 @@ ARCHITECTURE rtl OF evaluator IS
 			dataa  : IN std_logic_vector(N DOWNTO 0); -- Operand A (always required)
 			datab  : IN std_logic_vector(N DOWNTO 0); -- Operand B (optional)
 			result : OUT std_logic_vector(N + 1 DOWNTO 0); -- result (always required)
-			
+
 		  --Custom I/O
 		  sub_i : IN std_logic;
 		  p_i   : IN std_logic_vector(N - 1 DOWNTO 0);
@@ -89,7 +89,7 @@ BEGIN
 
 	G1  : FOR i IN (NB_ADD - 1) DOWNTO 0 GENERATE
 		ADD : Omura_Optimized
-			GENERIC MAP(N => N/5)
+			GENERIC MAP(N => N/5 - 1)
 		PORT MAP(
 			clk    => clk_s,
 			reset  => reset_s,
@@ -98,7 +98,7 @@ BEGIN
 			done   => done_s(i),
 			dataa  => dataa_s(i * (N/5) + (N/5) - 1 DOWNTO i * (N/5)),
 			datab  => datab_s(i * (N/5) + (N/5) - 1 DOWNTO i * (N/5)),
-			result => result_s(i * (N/5) + (N/5) - 1 DOWNTO i * (N/5)),
+			result => result_s(i * (N/5 +1) + (N/5+1) - 1 DOWNTO i * (N/5+1)),
 			sub_i  => sub_i_s(i),
 			p_i    => p_i_s,
 			m_i    => m_i_s
@@ -157,16 +157,16 @@ PROCESS (clk, reset)
 						datab_s(205 DOWNTO 103) <= datab(205 DOWNTO 103); --a3
 						--Adder 2
 						dataa_s(308 DOWNTO 206) <= dataa(102 DOWNTO 0); --a0
-						datab_s(308 DOWNTO 206) <= datab(308 - 2 DOWNTO 206) & (OTHERS => '0'); --a2*2^2
+						datab_s(308 DOWNTO 206+2) <= datab(308 - 2 DOWNTO 206); --a2*2^2
 						--Adder 3
-						dataa_s(411 DOWNTO 309) <= dataa(205 - 1 DOWNTO 103) & (OTHERS => '0'); -- 2a1
-						datab_s(411 DOWNTO 309) <= datab(411 - 3 DOWNTO 309) & (OTHERS => '0'); --2^3 * a3
+						dataa_s(411 DOWNTO 309+1) <= dataa(205 - 1 DOWNTO 103); -- 2a1
+						datab_s(411 DOWNTO 309+3) <= datab(411 - 3 DOWNTO 309); --2^3 * a3
 						--Adder 4
 						dataa_s(514 DOWNTO 412) <= dataa(102 DOWNTO 0); --a0
-						datab_s(514 DOWNTO 412) <= datab(308 - 4 DOWNTO 206) & (OTHERS => '0'); -- 2^4 * a2
+						datab_s(514 DOWNTO 412+4) <= datab(308 - 4 DOWNTO 206) ; -- 2^4 * a2
 						-- Adder 5
-						dataa_s(618 DOWNTO 515) <= dataa(205 - 2 DOWNTO 103) & (OTHERS => '0'); --2^2 * a1
-						datab_s(618 DOWNTO 515) <= datab(411 - 6 DOWNTO 309) & (OTHERS => '0'); -- 2^6 * a3
+						dataa_s(617 DOWNTO 515+2) <= dataa(205 - 2 DOWNTO 103); --2^2 * a1
+						datab_s(617 DOWNTO 515+6) <= datab(411 - 6 DOWNTO 309) ; -- 2^6 * a3
 
 						start_s <= (OTHERS => '1');
 						current_s <= TEMP;
@@ -177,47 +177,50 @@ PROCESS (clk, reset)
 						dataa_s(102 DOWNTO 0) <= result_s(102 DOWNTO 0); -- c
 						datab_s(102 DOWNTO 0) <= datab(514 DOWNTO 412); --a4
 						-- Adder 1
-						dataa_s(205 DOWNTO 103) <= dataa(205 DOWNTO 103); --a1
-						datab_s(205 DOWNTO 103) <= datab(205 DOWNTO 103); --a3
+						--dataa_s(205 DOWNTO 103) <= dataa(205 DOWNTO 103); --a1
+						--datab_s(205 DOWNTO 103) <= datab(205 DOWNTO 103); --a3
 						--Adder 2
-						dataa_s(308 DOWNTO 206) <= result_s(308 DOWNTO 206); --c
-						datab_s(308 DOWNTO 206) <= datab(514 - 4 DOWNTO 412) & (OTHERS => '0'); --a4*2^4
+						dataa_s(308 DOWNTO 206) <= result_s(310 DOWNTO 208); --c
+						datab_s(308 DOWNTO 206+4) <= datab(514 - 4 DOWNTO 412); --a4*2^4
 						--Adder 3
-						dataa_s(411 DOWNTO 309) <= dataa(205 - 1 DOWNTO 103) & (OTHERS => '0'); -- 2a1
-						datab_s(411 DOWNTO 309) <= datab(411 - 3 DOWNTO 309) & (OTHERS => '0'); --2^3 * a3
+						--dataa_s(411 DOWNTO 309+1) <= dataa(205 - 1 DOWNTO 103); -- 2a1
+						--datab_s(411 DOWNTO 309+3) <= datab(411 - 3 DOWNTO 309); --2^3 * a3
 						--Adder 4
-						dataa_s(514 DOWNTO 412) <= result_s(102 DOWNTO 0); --c
-						datab_s(514 DOWNTO 412) <= datab(514 - 8 DOWNTO 412) & (OTHERS => '0'); -- 2^8 * a4
+						dataa_s(514 DOWNTO 412)   <= result_s(102 DOWNTO 0); --c
+						datab_s(514 DOWNTO 412+8) <= datab(514 - 8 DOWNTO 412) ; -- 2^8 * a4
 						-- Adder 5
-						dataa_s(618 DOWNTO 515) <= dataa(205 - 4 DOWNTO 103) & (OTHERS => '0'); --2^2 * a1
-						datab_s(618 DOWNTO 515) <= datab(411 - 64 DOWNTO 309) & (OTHERS => '0'); -- 2^6 * a3
+						--dataa_s(618 DOWNTO 515+4) <= dataa(205 - 4 DOWNTO 103); --2^2 * a1
+						--datab_s(618 DOWNTO 515+6) <= datab(411 - 6 DOWNTO 309); -- 2^6 * a3
 
-						start_s <= (OTHERS => '1');
+						start_s(0) <= '1';
+						start_s(2) <= '1';
+						start_s(4) <= '1';
+
 						current_s <= TEMP;
 
 					END IF;
 
 					IF (counter = 2) THEN
 						-- Adder 0
-						dataa_s(102 DOWNTO 0) <= result_s(102 DOWNTO 0); -- sp1
-						datab_s(102 DOWNTO 0) <= result_s(205 DOWNTO 103); -- si1
+						dataa_s(102 DOWNTO 0) <= result_s(103-1 DOWNTO 0); -- sp1
+						datab_s(102 DOWNTO 0) <= result_s(207-1 DOWNTO 104); -- si1
 						-- Adder 1
-						dataa_s(205 DOWNTO 103) <= result_s(102 DOWNTO 0); -- sp1
-						datab_s(205 DOWNTO 103) <= result_s(205 DOWNTO 103); -- -si1
+						dataa_s(205 DOWNTO 103) <= result_s(103-1 DOWNTO 0); -- sp1
+						datab_s(205 DOWNTO 103) <= result_s(207-1 DOWNTO 104); -- -si1
 						sub_i_s(1) <= '1';
 						--Adder 2
-						dataa_s(308 DOWNTO 206) <= result_s(308 DOWNTO 206); -- sp2
-						datab_s(308 DOWNTO 206) <= result_s(411 DOWNTO 309); -- si2
+						dataa_s(308 DOWNTO 206) <= result_s(311-1 DOWNTO 208); -- sp2
+						datab_s(308 DOWNTO 206) <= result_s(415-1 DOWNTO 312); -- si2
 						--Adder 3
-						dataa_s(411 DOWNTO 309) <= result_s(308 DOWNTO 206); -- sp2
-						datab_s(411 DOWNTO 309) <= result_s(411 DOWNTO 309); -- -si2
+						dataa_s(411 DOWNTO 309) <= result_s(311-1 DOWNTO 208); -- sp2
+						datab_s(411 DOWNTO 309) <= result_s(415-1 DOWNTO 312); -- -si2
 						sub_i_s(3) <= '1';
 						--Adder 4
-						dataa_s(514 DOWNTO 412) <= result_s(514 DOWNTO 412); --sp4
-						datab_s(514 DOWNTO 412) <= result_s(618 DOWNTO 515); -- si4
+						dataa_s(514 DOWNTO 412) <= result_s(519-1 DOWNTO 416); --sp4
+						datab_s(514 DOWNTO 412) <= result_s(623-1 DOWNTO 520); -- si4
 						-- Adder 5
-						dataa_s(618 DOWNTO 515) <= result_s(514 DOWNTO 412); -- sp4
-						datab_s(618 DOWNTO 515) <= result_s(618 DOWNTO 515); -- -si4
+						dataa_s(617 DOWNTO 515) <= result_s(519-1 DOWNTO 416); -- sp4
+						datab_s(617 DOWNTO 515) <= result_s(623-1 DOWNTO 520); -- -si4
 						sub_i_s(5) <= '1';
 
 						start_s <= (OTHERS => '1');

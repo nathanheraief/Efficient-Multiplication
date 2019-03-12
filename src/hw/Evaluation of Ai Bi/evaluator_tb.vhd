@@ -32,7 +32,7 @@ ARCHITECTURE arch OF evaluator_tb IS
 	SIGNAL done_s   : std_logic;
 	SIGNAL dataa_s  : std_logic_vector(N_WIDTH DOWNTO 0);
 	SIGNAL datab_s  : std_logic_vector(N_WIDTH DOWNTO 0);
-	SIGNAL result_s : STD_LOGIC_vector(N_WIDTH + 1 DOWNTO 0);
+	SIGNAL result_s : STD_LOGIC_vector(N_WIDTH DOWNTO 0);
 	SIGNAL sub_i_s  : STD_LOGIC;
 	SIGNAL p_i_s    : STD_LOGIC_Vector(N_WIDTH - 1 DOWNTO 0);
 	SIGNAL m_i_s    : STD_LOGIC_Vector(N_WIDTH + 1 DOWNTO 0);
