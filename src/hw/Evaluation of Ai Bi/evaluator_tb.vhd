@@ -39,7 +39,7 @@ ARCHITECTURE arch OF evaluator_tb IS
 
 	COMPONENT evaluator
 	GENERIC (
-		N      : INTEGER := 515,
+		N      : INTEGER := 515;
 		NB_ADD : INTEGER := 6
 	);
 	PORT (
@@ -60,7 +60,7 @@ BEGIN
 	DUT : evaluator
 	GENERIC MAP(
 	N      => N_WIDTH,
-	NB_ADD => )
+	NB_ADD => ADD)
 	PORT MAP(
 		clk    => clk_s,
 		reset  => reset_s,

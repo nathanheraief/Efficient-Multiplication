@@ -11,13 +11,13 @@
 --
 ------------------------------------------------------------------------------
 LIBRARY IEEE;
-USE IEEE.std_logic_11NB_ADD4.ALL;
+USE IEEE.std_logic_1164.ALL;
 USE IEEE.numeric_std.ALL;
 USE IEEE.std_logic_unsigned.ALL;
 ------------------------------------------------------------------------------
 ENTITY evaluator IS
 	GENERIC (
-		N      : INTEGER := 515,
+		N      : INTEGER := 515;
 		NB_ADD : INTEGER := 6
 	);
 	PORT (
@@ -35,9 +35,10 @@ ENTITY evaluator IS
 END evaluator;
 
 ARCHITECTURE rtl OF evaluator IS
-	TYPE STATE_T IS (INIT, PRECALCUL, WAIT, CALCUL); --Vous pouvez rajouter des etats ici.
+	TYPE STATE_T IS (INIT, PRECALCUL, TEMP, CALCUL); --Vous pouvez rajouter des etats ici.
 
 	SIGNAL current_s : STATE_T;
+	SIGNAL busy      : std_logic := '0';
 
 	SIGNAL COUNTER   : INTEGER := 0;
 	SIGNAL SP1       : std_logic_vector(N/5 DOWNTO 0);--103 bits
@@ -49,10 +50,16 @@ ARCHITECTURE rtl OF evaluator IS
 
 	SIGNAL start_s   : std_logic_vector(NB_ADD - 1 DOWNTO 0);
 	SIGNAL clk_s     : std_logic;
+	SIGNAL reset_s   : std_logic;
+	SIGNAL clk_en_s  : std_logic;
 	SIGNAL done_s    : std_logic_vector(NB_ADD - 1 DOWNTO 0);
 	SIGNAL sub_i_s   : std_logic_vector(NB_ADD - 1 DOWNTO 0);
 	SIGNAL dataa_s   : std_logic_vector(NB_ADD * (N/5) DOWNTO 0);
 	SIGNAL datab_s   : std_logic_vector(NB_ADD * (N/5) DOWNTO 0);
+	SIGNAL result_s  : std_logic_vector(NB_ADD * (N/5) DOWNTO 0);
+	
+	SIGNAL m_i_s     : std_logic_vector(N-1 DOWNTO 0);
+	SIGNAL p_i_s     : std_logic_vector(N+1 DOWNTO 0);
 
 	COMPONENT Omura_Optimized
 		GENERIC (
@@ -67,7 +74,12 @@ ARCHITECTURE rtl OF evaluator IS
 			done   : OUT std_logic; -- Active high signal used to notify the CPU that result is valid (required for variable multi-cycle)
 			dataa  : IN std_logic_vector(N DOWNTO 0); -- Operand A (always required)
 			datab  : IN std_logic_vector(N DOWNTO 0); -- Operand B (optional)
-			result : OUT std_logic_vector(N + 1 DOWNTO 0) -- result (always required)
+			result : OUT std_logic_vector(N + 1 DOWNTO 0); -- result (always required)
+			
+		  --Custom I/O
+		  sub_i : IN std_logic;
+		  p_i   : IN std_logic_vector(N - 1 DOWNTO 0);
+		  m_i   : IN std_logic_vector(N + 1 DOWNTO 0)
 		);
 	END COMPONENT;
 
@@ -113,29 +125,29 @@ PROCESS (clk, reset)
 				WHEN INIT =>
 					IF (start = '1' AND busy = '0') THEN
 						done      <= '0';
-						current_s <= PREPROCESS;
+						current_s <= PRECALCUL;
 					ELSE
 						done      <= '0';
 						current_s <= INIT;
 					END IF;
 
-				WHEN WAIT =>
-					start_s = 0;
-					IF (done_s = (OTHERS <= '1')) THEN
+				WHEN TEMP =>
+					start_s <= (OTHERS => '0');
+					IF (done_s(0) = '1' AND done_s(1) = '1' AND done_s(2) = '1' AND done_s(3) = '1'
+					AND done_s(4) = '1' AND done_s(5) = '1') THEN
 						IF (counter = 2) THEN
 							current_s <= CALCUL;
-							counter = 0;
+							counter <= 0;
 						ELSE
-							counter = counter + 1;
+							counter <= counter + 1;
 							current_s <= PRECALCUL;
 						END IF;
 					ELSE
-						current_s <= WAIT;
+						current_s <= TEMP;
 					END IF;
 
 
 				WHEN PRECALCUL =>
-					start_s <= 0;
 					IF (counter = 0) THEN
 						-- Adder 0
 						dataa_s(102 DOWNTO 0) <= dataa(102 DOWNTO 0); --a0
@@ -156,8 +168,8 @@ PROCESS (clk, reset)
 						dataa_s(618 DOWNTO 515) <= dataa(205 - 2 DOWNTO 103) & (OTHERS => '0'); --2^2 * a1
 						datab_s(618 DOWNTO 515) <= datab(411 - 6 DOWNTO 309) & (OTHERS => '0'); -- 2^6 * a3
 
-						start_s <= 1;
-						current_s <= WAIT;
+						start_s <= (OTHERS => '1');
+						current_s <= TEMP;
 					END IF;
 
 					IF (counter = 1) THEN
@@ -175,13 +187,13 @@ PROCESS (clk, reset)
 						datab_s(411 DOWNTO 309) <= datab(411 - 3 DOWNTO 309) & (OTHERS => '0'); --2^3 * a3
 						--Adder 4
 						dataa_s(514 DOWNTO 412) <= result_s(102 DOWNTO 0); --c
-						datab_s(514 DOWNTO 412) <= datab(514 - 8 DOWNTO 412 & (OTHERS => '0'); -- 2^8 * a4
+						datab_s(514 DOWNTO 412) <= datab(514 - 8 DOWNTO 412) & (OTHERS => '0'); -- 2^8 * a4
 						-- Adder 5
 						dataa_s(618 DOWNTO 515) <= dataa(205 - 4 DOWNTO 103) & (OTHERS => '0'); --2^2 * a1
 						datab_s(618 DOWNTO 515) <= datab(411 - 64 DOWNTO 309) & (OTHERS => '0'); -- 2^6 * a3
 
-						start_s <= 1;
-						current_s <= WAIT;
+						start_s <= (OTHERS => '1');
+						current_s <= TEMP;
 
 					END IF;
 
@@ -208,8 +220,8 @@ PROCESS (clk, reset)
 						datab_s(618 DOWNTO 515) <= result_s(618 DOWNTO 515); -- -si4
 						sub_i_s(5) <= '1';
 
-						start_s <= 1;
-						current_s <= WAIT;
+						start_s <= (OTHERS => '1');
+						current_s <= TEMP;
 
 					END IF;
 
