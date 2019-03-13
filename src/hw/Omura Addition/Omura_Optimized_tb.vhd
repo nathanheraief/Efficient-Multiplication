@@ -84,8 +84,8 @@ BEGIN
 		dataa_s <= (OTHERS => '0');
 		datab_s <= (OTHERS => '0');
 		WAIT FOR TIME_DELTA;
-		dataa_s <= "00011";
-		datab_s <= "00101";
+		dataa_s <= "00101";
+		datab_s <= "00011";
 
 		p_i_s   <= "0111";
 		sub_i_s <= '0';

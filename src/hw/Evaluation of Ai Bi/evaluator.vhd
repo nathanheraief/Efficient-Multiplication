@@ -78,8 +78,7 @@ ARCHITECTURE rtl OF evaluator IS
 
 		  --Custom I/O
 		  sub_i : IN std_logic;
-		  p_i   : IN std_logic_vector(N - 1 DOWNTO 0);
-		  m_i   : IN std_logic_vector(N + 1 DOWNTO 0)
+		  p_i   : IN std_logic_vector(N - 1 DOWNTO 0)
 		);
 	END COMPONENT;
 
@@ -100,8 +99,7 @@ BEGIN
 			datab  => datab_s(i * (N/5) + (N/5) - 1 DOWNTO i * (N/5)),
 			result => result_s(i * (N/5 +1) + (N/5+1) - 1 DOWNTO i * (N/5+1)),
 			sub_i  => sub_i_s(i),
-			p_i    => p_i_s,
-			m_i    => m_i_s
+			p_i    => p_i_s
 		);
 END GENERATE G1;
 PROCESS (clk, reset)

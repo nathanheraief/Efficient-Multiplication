@@ -120,7 +120,7 @@ BEGIN
 
 				WHEN RESCALE =>
 					IF (S(N + 1) = '1') THEN
-						to_be_written <= NOT S;
+						to_be_written <= S + (p_s(N DOWNTO 0)&'0');
 						current_s     <= WRITE;
 					ELSE
 						IF (Sp(N) = '1') THEN

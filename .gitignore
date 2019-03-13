@@ -8,3 +8,9 @@ Efficient\.cr\.mti
 Efficient\.mpf
 
 *.mti
+
+src/hw/Evaluation of Ai Bi/evaluator\.vhd
+
+src/hw/Omura Addition/Omura_Optimized\.vhd
+
+src/hw/Omura Addition/Omura_Optimized_tb\.vhd
