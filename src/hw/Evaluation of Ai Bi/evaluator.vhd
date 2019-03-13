@@ -29,7 +29,7 @@ ENTITY evaluator IS
 		done   : OUT std_logic; -- Active high signal used to notify the CPU that result is valid (required for variable multi-cycle)
 		dataa  : IN std_logic_vector(N DOWNTO 0); -- Operand A (always required)
 		datab  : IN std_logic_vector(N DOWNTO 0); -- Operand B (optional)
-		result : OUT std_logic_vector(N DOWNTO 0) -- result (always required)
+		result : OUT std_logic_vector((N/5)*7-1 DOWNTO 0) -- result (always required)
 
 	);
 END evaluator;
@@ -229,7 +229,12 @@ PROCESS (clk, reset)
 					END IF;
 
 				WHEN CALCUL =>
-					result <= result_s;
+					result(617 DOWNTO 0) <= result_s(622 DOWNTO 520) &
+					                          result_s(518 DOWNTO 416) &
+					                          result_s(414 DOWNTO 312) &
+					                          result_s(310 DOWNTO 208) &
+					                          result_s(206 DOWNTO 104) &
+					                          result_s(102 DOWNTO 0);
 
 
 			END CASE;

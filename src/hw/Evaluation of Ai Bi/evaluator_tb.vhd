@@ -32,7 +32,7 @@ ARCHITECTURE arch OF evaluator_tb IS
 	SIGNAL done_s   : std_logic;
 	SIGNAL dataa_s  : std_logic_vector(N_WIDTH DOWNTO 0);
 	SIGNAL datab_s  : std_logic_vector(N_WIDTH DOWNTO 0);
-	SIGNAL result_s : STD_LOGIC_vector(N_WIDTH DOWNTO 0);
+	SIGNAL result_s : STD_LOGIC_vector((N_WIDTH/5)*7-1 DOWNTO 0);
 	SIGNAL sub_i_s  : STD_LOGIC;
 	SIGNAL p_i_s    : STD_LOGIC_Vector(N_WIDTH - 1 DOWNTO 0);
 	SIGNAL m_i_s    : STD_LOGIC_Vector(N_WIDTH + 1 DOWNTO 0);
@@ -51,7 +51,7 @@ ARCHITECTURE arch OF evaluator_tb IS
 		done   : OUT std_logic; -- Active high signal used to notify the CPU that result is valid (required for variable multi-cycle)
 		dataa  : IN std_logic_vector(N DOWNTO 0); -- Operand A (always required)
 		datab  : IN std_logic_vector(N DOWNTO 0); -- Operand B (optional)
-		result : OUT std_logic_vector(N DOWNTO 0) -- result (always required)
+		result : OUT std_logic_vector((N/5)*7-1 DOWNTO 0) -- result (always required)
 
 	);
 	END COMPONENT;
