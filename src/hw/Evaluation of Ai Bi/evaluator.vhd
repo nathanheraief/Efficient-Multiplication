@@ -107,6 +107,13 @@ END GENERATE G1;
 PROCESS (clk, reset)
 	BEGIN
 		IF (reset = '1') THEN
+		  
+	        start_s       <= (OTHERS => '0');
+	        dataa_s       <= (OTHERS => '0');
+	        datab_s       <= (OTHERS => '0');
+	       result_s       <= (OTHERS => '0');
+		    m_i_s       <= (OTHERS => '0');
+		    p_i_s       <= "100111101000110110100001100100110101110101010101001011001010011100110110000111000010010000001100000001";
 			SP1       <= (OTHERS => '0');
 			SI1       <= (OTHERS => '0');
 			SP2       <= (OTHERS => '0');
@@ -133,8 +140,7 @@ PROCESS (clk, reset)
 
 				WHEN TEMP =>
 					start_s <= (OTHERS => '0');
-					IF (done_s(0) = '1' AND done_s(1) = '1' AND done_s(2) = '1' AND done_s(3) = '1'
-					AND done_s(4) = '1' AND done_s(5) = '1') THEN
+					IF (done_s = "111111" OR done_s = "010101" ) THEN
 						IF (counter = 2) THEN
 							current_s <= CALCUL;
 							counter <= 0;
