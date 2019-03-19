@@ -23,7 +23,7 @@ END Montgomery_Multiplication_tb;
 
 ARCHITECTURE arch OF Montgomery_Multiplication_tb IS
 
-	CONSTANT N_WIDTH    : INTEGER   := 2;
+	CONSTANT N_WIDTH    : INTEGER   := 6;
 	CONSTANT TIME_DELTA : TIME      := 6 ns;
 
 	SIGNAL clk_s        : std_logic := '0';
@@ -36,11 +36,10 @@ ARCHITECTURE arch OF Montgomery_Multiplication_tb IS
 	SIGNAL result_s     : STD_LOGIC_vector(N_WIDTH + 1 DOWNTO 0);
 
 	SIGNAL p_i_s        : STD_LOGIC_Vector(N_WIDTH - 1 DOWNTO 0);
-	SIGNAL m_i_s        : STD_LOGIC_Vector(N_WIDTH + 1 DOWNTO 0);
 
 	COMPONENT Montgomery_Multiplication
 		GENERIC (
-			N : INTEGER := 577
+			N : INTEGER := 15
 		);
 		PORT (
 			-- Required by CPU
@@ -51,11 +50,10 @@ ARCHITECTURE arch OF Montgomery_Multiplication_tb IS
 			done   : OUT std_logic;                        -- Active high signal used to notify the CPU that result is valid (required for variable multi-cycle)
 			dataa  : IN std_logic_vector(N DOWNTO 0);      -- Operand A (always required)
 			datab  : IN std_logic_vector(N DOWNTO 0);      -- Operand B (always required)
-			result : OUT std_logic_vector(N + 1 DOWNTO 0); -- result (always required)
+			result : OUT std_logic_vector(N_WIDTH + 1 DOWNTO 0); -- result (always required)
 
 			--Custom I/O
-			p_i    : IN std_logic_vector(N - 1 DOWNTO 0);
-			m_i    : IN std_logic_vector(N + 1 DOWNTO 0)
+			p_i    : IN std_logic_vector(N - 1 DOWNTO 0)
 		);
 	END COMPONENT;
 
@@ -71,8 +69,7 @@ BEGIN
 		dataa  => dataa_s,
 		datab  => datab_s,
 		result => result_s,
-		p_i    => p_i_s,
-		m_i    => m_i_s
+		p_i    => p_i_s
 	);
 
 	clk_s <= NOT clk_s AFTER TIME_DELTA;
@@ -80,21 +77,26 @@ BEGIN
 	do_check_out_result : PROCESS
 	BEGIN
 		reset_s <= '1';
+
 		WAIT FOR 2 * TIME_DELTA;
 		reset_s <= '0';
+
 		WAIT FOR TIME_DELTA;
 		dataa_s <= (OTHERS => '0');
 		datab_s <= (OTHERS => '0');
-		WAIT FOR TIME_DELTA;
-		dataa_s <= "101";
-		datab_s <= "111";
+		p_i_s		<= (OTHERS => '0');
 
-		p_i_s   <= "11";
-		m_i_s   <= "1111";
+		WAIT FOR TIME_DELTA;
+		dataa_s(N_WIDTH DOWNTO 0) 		<= "0000111"; --7
+		datab_s(N_WIDTH DOWNTO 0) 		<= "0011000"; --3 * 8
+		p_i_s(N_WIDTH - 1 DOWNTO 0)   <= "001011";  --11
+
 		WAIT FOR TIME_DELTA;
 		start_s <= '1';
+
 		WAIT FOR 2 * TIME_DELTA;
 		start_s <= '0';
+
 		WAIT;
 	END PROCESS do_check_out_result;
 
