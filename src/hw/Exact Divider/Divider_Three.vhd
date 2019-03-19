@@ -1,9 +1,9 @@
 -------------------------------------------------------------------------------
--- Title : Omura Addition Unclocked Optimized
+-- Title : Divider Three
 -- Project : Efficient multiplication
 -------------------------------------------------------------------------------
 -- File : Divider_Three.vhd
--- Author : Heraief Nathan
+-- Author : Aboubakri Mehdi
 -- Created : 19 Mars 2019
 -- Last update: 19 Mars 2019
 -------------------------------------------------------------------------------

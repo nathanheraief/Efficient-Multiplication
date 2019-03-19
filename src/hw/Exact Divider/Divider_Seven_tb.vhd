@@ -1,13 +1,13 @@
 -------------------------------------------------------------------------------
--- Title : Omura_Optimized_tb
+-- Title : Divider Seven test bench
 -- Project : Efficient multiplication
 -------------------------------------------------------------------------------
--- File : Omura_Optimized_tb.vhd
--- Author : Heraief Nathan
--- Created : 18 Feb 2019
--- Last update: 12 Mar 2019
+-- File : Divider_Seven_tb.vhd
+-- Author : Aboubakri Mehdi
+-- Created : 19 Mars 2019
+-- Last update: 19 Mars 2019
 -------------------------------------------------------------------------------
--- Description: Testbench for Omura_Optimized_tb
+-- Description: Testbench for Divider_Five
 --
 ------------------------------------------------------------------------------
 LIBRARY IEEE;

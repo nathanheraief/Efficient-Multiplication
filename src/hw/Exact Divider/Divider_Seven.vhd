@@ -1,13 +1,13 @@
 -------------------------------------------------------------------------------
--- Title : Omura Addition Unclocked Optimized
+-- Title : Exact Divider by 7
 -- Project : Efficient multiplication
 -------------------------------------------------------------------------------
 -- File : Divider_Seven.vhd
--- Author : Heraief Nathan
+-- Author : Aboubakri Mehdi
 -- Created : 19 Mars 2019
 -- Last update: 19 Mars 2019
 -------------------------------------------------------------------------------
--- Description: Implementation of the exact division by 3
+-- Description: Implementation of the exact division by 7
 --
 ------------------------------------------------------------------------------
 

@@ -5,7 +5,7 @@
 -- File : Montgomery_Multiplication.vhd
 -- Author : Aboubakri Mehdi
 -- Created : 08 Mars 2019
--- Last update: 08 Mars 2019
+-- Last update: 18 Mars 2019
 -------------------------------------------------------------------------------
 -- Description: Implementation of the Montgomery Method to compute modular Multiplication
 --
@@ -102,21 +102,6 @@ BEGIN
 		p_i    => p_i_s_i
 	);
 
-	-- ADD2 : Omura_Optimized
-	-- GENERIC MAP(N => 2 * N + 2)
-	-- PORT MAP(
-	-- 	clk    => clk_s,
-	-- 	reset  => reset_s,
-	-- 	clk_en => clk_en_s,
-	-- 	start  => start_s(1),
-	-- 	done   => done_s(1),
-	-- 	dataa  => St,
-	-- 	datab  => p_i_s_ii(2 * N + 2 DOWNTO 0),
-	-- 	result => Stm,
-	-- 	sub_i  => sub_i_s(1),
-	-- 	p_i    => p_i_s_ii(2 * N + 1 DOWNTO 0)
-	-- );
-
 	PROCESS (clk, reset)
 
 		VARIABLE count : INTEGER RANGE 0 TO N := 0; -- set to 0 when process first starts
@@ -178,31 +163,12 @@ BEGIN
 					current_s <= CALCUL;
 
 				WHEN CALCUL =>
-					-- start_s(0) <= '0';
-					-- IF (addId = 1) THEN
-					-- 	start_s(0) <= '0';
-					-- ELSE
-					-- 	start_s(0) <= '1';
-					-- 	addId := 1;
-					-- END IF;
-					-- IF (done_s(0) = '1' AND start_s(1) = '0') THEN
-					-- 	current_s <= LAUNCHADD;
-					-- END IF;
-
-					-- IF (done_s = '1') THEN
-					-- 	current_s <= LAUNCHADD;
-					-- END IF;
-
-					-- IF (addId = 1) THEN
-						-- start_s <= "00";
 					IF (St(0) = '1') THEN
 						S         <= Stm; -- Stm = S + t + modulo
 					ELSE
 						S         <= St; -- St = S + t
 					END IF;
 					current_s <= RESCALE;
-					-- END IF;
-
 
 				WHEN RESCALE =>
 					addId := 0;
@@ -225,7 +191,6 @@ BEGIN
 					
 				WHEN WRITE =>
 					result    <= modulo_s(N + 1 DOWNTO 0);
-					-- start_s		<= "00";
 					done      <= '1';
 					current_s <= INIT;
 
