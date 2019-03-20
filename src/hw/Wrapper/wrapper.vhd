@@ -54,6 +54,8 @@ architecture rtl of wrapper is
   SIGNAL reset_s       : std_logic;
   SIGNAL clk_en_s      : std_logic;
   SIGNAL done_s        : std_logic;
+  SIGNAL dataa_s       : std_logic_vector(514 DOWNTO 0);
+  SIGNAL result_s       : std_logic_vector(720 DOWNTO 0);
 
 BEGIN
 
@@ -69,8 +71,9 @@ PORT MAP(
 );
 
 clk_s <= clk;
-result_s <= reset;
-start <= start_s;
-dataa <= ;
+reset_s <= reset;
+start_s <= start;
+
+dataa_s <= (others => '0') ;
 
 end architecture;
