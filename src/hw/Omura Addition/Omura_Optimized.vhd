@@ -86,7 +86,8 @@ BEGIN
 				WHEN INIT =>
 					IF (start = '1' AND busy = '0') THEN
 						done      <= '0';
-						m             <= (OTHERS => '0');
+             <= (OTHERS => '0');
+						m					<= (OTHERS => '0')
 						dataa_p   <= (N + 1 DOWNTO dataa'length => '0') & dataa;
 						datab_p   <= (N + 1 DOWNTO datab'length => '0') & datab;
 						p_s       <= "00" & p_i;
@@ -99,7 +100,7 @@ BEGIN
 					END IF;
 
 				WHEN PREPROCESS =>
-				    m(n)      <='1';
+				  m(n)      <='1';  
 					IF (sub_i = '1') THEN
 						datab_f   <= NOT datab_p + 1;
 						dataa_f   <= dataa_p;
@@ -111,7 +112,7 @@ BEGIN
 					END IF;
 
 				WHEN CALCUL =>
-				     m             <= m  +np_s;
+					m             <= m  +np_s;
 					S                  <= dataa_f + datab_f;
 					current_s          <= MODULO;
 					
