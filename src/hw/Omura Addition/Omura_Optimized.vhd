@@ -51,7 +51,7 @@ ARCHITECTURE rtl OF Omura_Optimized IS
 	SIGNAL p_s            : STD_LOGIC_VECTOR(N +1  DOWNTO 0);
 	SIGNAL np_s          : STD_LOGIC_VECTOR(N +1  DOWNTO 0);
 	SIGNAL m             : STD_LOGIC_VECTOR(N + 1 DOWNTO 0);
---SIGNAL debug         :  STD_LOGIC_VECTOR(N +1  DOWNTO 0);
+    SIGNAL powerN        : STD_LOGIC_VECTOR(N + 1 DOWNTO 0);
 	SIGNAL busy          : STD_LOGIC;
 	SIGNAL T1            : STD_LOGIC;
 	SIGNAL T2            : STD_LOGIC;
@@ -75,8 +75,7 @@ BEGIN
 			busy          <= '0';
 			result        <= (OTHERS => '0');
 			done          <= '0';
-			T1            <= '0';
-			T2            <= '0';
+			powerN        <= (OTHERS => '0');
 			current_s     <= Init;
 			
 
@@ -87,11 +86,12 @@ BEGIN
 				WHEN INIT =>
 					IF (start = '1' AND busy = '0') THEN
 						done      <= '0';
-						m(n)      <='1';
+						m             <= (OTHERS => '0');
 						dataa_p   <= (N + 1 DOWNTO dataa'length => '0') & dataa;
 						datab_p   <= (N + 1 DOWNTO datab'length => '0') & datab;
 						p_s       <= "00" & p_i;
 						np_s      <= not ("00"&p_i) +1;
+						powerN(N)    <= '1' ;
 						current_s <= PREPROCESS;
 					ELSE
 						done      <= '0';
@@ -99,7 +99,7 @@ BEGIN
 					END IF;
 
 				WHEN PREPROCESS =>
-				    m             <= m  +np_s;
+				    m(n)      <='1';
 					IF (sub_i = '1') THEN
 						datab_f   <= NOT datab_p + 1;
 						dataa_f   <= dataa_p;
@@ -111,6 +111,7 @@ BEGIN
 					END IF;
 
 				WHEN CALCUL =>
+				     m             <= m  +np_s;
 					S                  <= dataa_f + datab_f;
 					current_s          <= MODULO;
 					
@@ -124,7 +125,7 @@ BEGIN
 						current_s     <= WRITE;
 					ELSE
 						IF (Sp(N) = '1') THEN
-							to_be_written <= Sp - 2**n;
+							to_be_written <= Sp - powerN;
 							current_s     <= WRITE;
 						ELSE
 							to_be_written <= S;
