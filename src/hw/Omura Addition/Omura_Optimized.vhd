@@ -86,8 +86,7 @@ BEGIN
 				WHEN INIT =>
 					IF (start = '1' AND busy = '0') THEN
 						done      <= '0';
-             <= (OTHERS => '0');
-						m					<= (OTHERS => '0')
+						m	      <= (OTHERS => '0');
 						dataa_p   <= (N + 1 DOWNTO dataa'length => '0') & dataa;
 						datab_p   <= (N + 1 DOWNTO datab'length => '0') & datab;
 						p_s       <= "00" & p_i;
