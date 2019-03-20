@@ -1,3 +1,4 @@
+
 -------------------------------------------------------------------------------
 -- Title : Omura_Optimized_tb
 -- Project : Efficient multiplication
@@ -83,7 +84,8 @@ BEGIN
 		dataa_s <= (OTHERS => '0');
 		datab_s <= (OTHERS => '0');
 		WAIT FOR TIME_DELTA;
-		dataa_s <= "01101";
+		dataa_s <= "01000";
+
 		datab_s <= "00000";
 
 		p_i_s   <= "1011";
