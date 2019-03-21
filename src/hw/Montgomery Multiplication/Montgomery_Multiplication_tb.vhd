@@ -23,7 +23,7 @@ END Montgomery_Multiplication_tb;
 
 ARCHITECTURE arch OF Montgomery_Multiplication_tb IS
 
-	CONSTANT N_WIDTH    : INTEGER   := 6;
+	CONSTANT N_WIDTH    : INTEGER   := 4;
 	CONSTANT TIME_DELTA : TIME      := 6 ns;
 
 	SIGNAL clk_s        : std_logic := '0';
@@ -33,9 +33,9 @@ ARCHITECTURE arch OF Montgomery_Multiplication_tb IS
 	SIGNAL done_s       : std_logic;
 	SIGNAL dataa_s      : std_logic_vector(N_WIDTH DOWNTO 0);
 	SIGNAL datab_s      : std_logic_vector(N_WIDTH DOWNTO 0);
-	SIGNAL result_s     : STD_LOGIC_vector(N_WIDTH + 1 DOWNTO 0);
+	SIGNAL result_s     : STD_LOGIC_vector(N_WIDTH DOWNTO 0);
 
-	SIGNAL p_i_s        : STD_LOGIC_Vector(N_WIDTH - 1 DOWNTO 0);
+	SIGNAL p_i_s        : STD_LOGIC_Vector(N_WIDTH DOWNTO 0);
 
 	COMPONENT Montgomery_Multiplication
 		GENERIC (
@@ -50,10 +50,10 @@ ARCHITECTURE arch OF Montgomery_Multiplication_tb IS
 			done   : OUT std_logic;                        -- Active high signal used to notify the CPU that result is valid (required for variable multi-cycle)
 			dataa  : IN std_logic_vector(N DOWNTO 0);      -- Operand A (always required)
 			datab  : IN std_logic_vector(N DOWNTO 0);      -- Operand B (always required)
-			result : OUT std_logic_vector(N_WIDTH + 1 DOWNTO 0); -- result (always required)
+			result : OUT std_logic_vector(N DOWNTO 0); -- result (always required)
 
 			--Custom I/O
-			p_i    : IN std_logic_vector(N - 1 DOWNTO 0)
+			p_i    : IN std_logic_vector(N DOWNTO 0)
 		);
 	END COMPONENT;
 
@@ -87,9 +87,9 @@ BEGIN
 		p_i_s		<= (OTHERS => '0');
 
 		WAIT FOR TIME_DELTA;
-		dataa_s(N_WIDTH DOWNTO 0) 		<= "0000111"; --7
-		datab_s(N_WIDTH DOWNTO 0) 		<= "0011000"; --3 * 8
-		p_i_s(N_WIDTH - 1 DOWNTO 0)   <= "001011";  --11
+		dataa_s(N_WIDTH DOWNTO 0) 		<= "00111"; --7
+		datab_s(N_WIDTH DOWNTO 0) 		<= "11000"; --3 * 8
+		p_i_s(N_WIDTH DOWNTO 0)   <= "01011";  --11
 
 		WAIT FOR TIME_DELTA;
 		start_s <= '1';

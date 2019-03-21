@@ -28,10 +28,10 @@ ENTITY Montgomery_Multiplication IS
 		done   : OUT std_logic;                        -- Active high signal used to notify the CPU that result is valid (required for variable multi-cycle)
 		dataa  : IN std_logic_vector(N DOWNTO 0);      -- Operand A (always required)
 		datab  : IN std_logic_vector(N DOWNTO 0);      -- Operand B (always required)
-		result : OUT std_logic_vector(N + 1 DOWNTO 0); -- result (always required)
+		result : OUT std_logic_vector(N DOWNTO 0); -- result (always required)
 
 		--Custom I/O
-		p_i    : IN std_logic_vector(N - 1 DOWNTO 0)
+		p_i    : IN std_logic_vector(N DOWNTO 0)
 	);
 END Montgomery_Multiplication;
 
@@ -50,11 +50,11 @@ ARCHITECTURE rtl OF Montgomery_Multiplication IS
 			done   : OUT std_logic;                        -- Active high signal used to notify the CPU that result is valid (required for variable multi-cycle)
 			dataa  : IN std_logic_vector(N DOWNTO 0);      -- Operand A (always required)
 			datab  : IN std_logic_vector(N DOWNTO 0);      -- Operand B (always required)
-			result : OUT std_logic_vector(N + 1 DOWNTO 0); -- result (always required)
+			result : OUT std_logic_vector(N DOWNTO 0); -- result (always required)
 
 			--Custom I/O
 			sub_i  : IN std_logic;
-			p_i    : IN std_logic_vector(N - 1 DOWNTO 0)
+			p_i    : IN std_logic_vector(N DOWNTO 0)
 		);
 
 	END COMPONENT;
@@ -77,9 +77,7 @@ ARCHITECTURE rtl OF Montgomery_Multiplication IS
 	SIGNAL Stm       : STD_LOGIC_VECTOR(2 * N + 3 DOWNTO 0);
 	SIGNAL p_i_s_i   : STD_LOGIC_VECTOR(2 * N + 2 DOWNTO 0);     --for first adder
 	SIGNAL p_i_s_ii  : STD_LOGIC_VECTOR(2 * N + 3 DOWNTO 0); --for second adder
-	-- SIGNAL p_i_s_f       : STD_LOGIC_VECTOR(2*N + 2 DOWNTO 0);
 	SIGNAL busy      : STD_LOGIC;
-	SIGNAL addition_s: STD_LOGIC;
 
 BEGIN
 
@@ -104,7 +102,7 @@ BEGIN
 
 	PROCESS (clk, reset)
 
-		VARIABLE count : INTEGER RANGE 0 TO N := 0; -- set to 0 when process first starts
+		VARIABLE count : INTEGER RANGE 0 TO N + 1 := 0; -- set to 0 when process first starts
 		VARIABLE addId : INTEGER RANGE 0 TO 1 := 0;
 
 	BEGIN
@@ -135,8 +133,8 @@ BEGIN
 						done      								<= '0';
 						dataa_s(N DOWNTO 0)   		<= dataa;
 						datab_s(N DOWNTO 0)   		<= datab;
-						p_i_s_i(N - 1 DOWNTO 0)  	<= p_i;
-						p_i_s_ii(N - 1 DOWNTO 0) 	<= p_i;
+						p_i_s_i(N DOWNTO 0)  	<= p_i;
+						p_i_s_ii(N DOWNTO 0) 	<= p_i;
 						Stm												<= (OTHERS => '0');
 						current_s <= PREPROCESS;
 					ELSE
@@ -173,7 +171,7 @@ BEGIN
 				WHEN RESCALE =>
 					addId := 0;
 					S <= std_logic_vector(shift_right(unsigned(S), 1));
-					IF (count = N - 1) THEN
+					IF (count = N + 1) THEN
 						count := 0;
 						start_s <= '1';
 						current_s <= MODULO;
@@ -190,7 +188,7 @@ BEGIN
 
 					
 				WHEN WRITE =>
-					result    <= modulo_s(N + 1 DOWNTO 0);
+					result    <= modulo_s(N DOWNTO 0);
 					done      <= '1';
 					current_s <= INIT;
 
