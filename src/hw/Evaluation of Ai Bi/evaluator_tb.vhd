@@ -50,14 +50,14 @@ ARCHITECTURE arch OF evaluator_tb IS
 		NB_ADD : INTEGER := 6
 	);
 	PORT (
-		-- Required by CPU
 		clk    : IN std_logic;                              -- CPU system clock (always required)
 		reset  : IN std_logic;                              -- CPU master asynchronous active high reset (always required)
 		clk_en : IN std_logic;                              -- Clock-qualifier (always required)
 		start  : IN std_logic;                              -- Active high signal used to specify that inputs are valid (always required)
 		done   : OUT std_logic;                             -- Active high signal used to notify the CPU that result is valid (required for variable multi-cycle)
-		dataa  : IN std_logic_vector(5 * N - 1 DOWNTO 0);       -- Operand A (always required)
-		result : OUT std_logic_vector((N) * 7 - 1 DOWNTO 0) -- result (always required)
+		dataa  : IN std_logic_vector(5 * (N) - 1 DOWNTO 0); -- Operand A (always required)
+		result : OUT std_logic_vector((N) * 7 - 1 DOWNTO 0); -- result (always required)
+		p    : IN std_logic_vector(N - 2 DOWNTO 0)
 
 	);
 	END COMPONENT;
@@ -74,7 +74,8 @@ BEGIN
 		start  => start_s,
 		done   => done_s,
 		dataa  => dataa_s,
-		result => result_s
+		result => result_s,
+		p      => p_i_s
 	);
 
 	clk_s <= NOT clk_s AFTER TIME_DELTA;
