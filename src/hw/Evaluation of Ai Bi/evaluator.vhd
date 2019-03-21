@@ -29,8 +29,8 @@ ENTITY evaluator IS
 		start  : IN std_logic;                              -- Active high signal used to specify that inputs are valid (always required)
 		done   : OUT std_logic;                             -- Active high signal used to notify the CPU that result is valid (required for variable multi-cycle)
 		dataa  : IN std_logic_vector(5 * (N) - 1 DOWNTO 0); -- Operand A (always required)
-		result : OUT std_logic_vector((N) * 7 - 1 DOWNTO 0) -- result (always required)
-
+		result : OUT std_logic_vector((N) * 7 - 1 DOWNTO 0); -- result (always required)
+		p    : IN std_logic_vector(N - 2 DOWNTO 0)
 	);
 END evaluator;
 ARCHITECTURE rtl OF evaluator IS
@@ -52,7 +52,6 @@ ARCHITECTURE rtl OF evaluator IS
 	SIGNAL result_s      : std_logic_vector(NB_ADD * (N + 1) - 1 DOWNTO 0);
 	SIGNAL store         : std_logic_vector((N) - 1 DOWNTO 0);
 	SIGNAL bigstore      : std_logic_vector(5 * (N) + (N) - 1 DOWNTO 0);
-	SIGNAL p_i_s         : std_logic_vector(N - 2 DOWNTO 0);
 
 	COMPONENT Omura_Optimized
 		GENERIC (
@@ -92,7 +91,7 @@ BEGIN
 			datab  => datab_s(i * (N) + (N) - 1 DOWNTO i * (N)),
 			result => result_s(i * (N + 1) + (N + 1) - 1 DOWNTO i * (N + 1)),
 			sub_i  => sub_i_s(i),
-			p_i    => p_i_s
+			p_i    => p
 		);
 	END GENERATE G1;
 
