@@ -87,8 +87,8 @@ BEGIN
 		p_i_s		<= (OTHERS => '0');
 
 		WAIT FOR TIME_DELTA;
-		dataa_s(N_WIDTH DOWNTO 0) 		<= "00111"; --7
-		datab_s(N_WIDTH DOWNTO 0) 		<= "11000"; --3 * 8
+		datab_s(N_WIDTH DOWNTO 0) 		<= "00101"; --7
+		dataa_s(N_WIDTH DOWNTO 0) 		<= "00011"; --5
 		p_i_s(N_WIDTH DOWNTO 0)   <= "01011";  --11
 
 		WAIT FOR TIME_DELTA;

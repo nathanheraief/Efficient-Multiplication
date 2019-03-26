@@ -51,7 +51,7 @@ ARCHITECTURE rtl OF Omura_Optimized IS
 	SIGNAL p_s            : STD_LOGIC_VECTOR(N +1  DOWNTO 0);
 	SIGNAL np_s          : STD_LOGIC_VECTOR(N +1  DOWNTO 0);
 	SIGNAL m             : STD_LOGIC_VECTOR(N + 1 DOWNTO 0);
-    SIGNAL powerN        : STD_LOGIC_VECTOR(N + 1 DOWNTO 0);
+  SIGNAL powerN        : STD_LOGIC_VECTOR(N + 1 DOWNTO 0);
 	SIGNAL busy          : STD_LOGIC;
 	SIGNAL T1            : STD_LOGIC;
 	SIGNAL T2            : STD_LOGIC;
@@ -136,9 +136,7 @@ BEGIN
 					result    <= to_be_written;
 					Done      <= '1';
 					current_s <= INIT;
-
 			END CASE;
 		END IF;
 	END PROCESS;
-
 END rtl;
