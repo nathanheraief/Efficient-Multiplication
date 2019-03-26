@@ -22,7 +22,7 @@ END Omura_Optimized_tb;
 
 ARCHITECTURE arch OF Omura_Optimized_tb IS
 
-	CONSTANT N_WIDTH    : INTEGER := 4;
+	CONSTANT N_WIDTH    : INTEGER := 103;
 	CONSTANT TIME_DELTA : TIME    := 6 ns;
 
 	SIGNAL clk_s    : std_logic := '0';
@@ -83,13 +83,14 @@ BEGIN
 		WAIT FOR TIME_DELTA;
 		dataa_s <= (OTHERS => '0');
 		datab_s <= (OTHERS => '0');
+		p_i_s 	<= (OTHERS => '0');
 		WAIT FOR TIME_DELTA;
-		dataa_s <= "01000";
 
-		datab_s <= "00000";
-
-		p_i_s   <= "1011";
+		dataa_s(N_WIDTH) <= '1';
+		datab_s(0) <= '0';
+		p_i_s(8 DOWNTO 0) <= "100100101";		
 		sub_i_s <= '0';
+
 		WAIT FOR TIME_DELTA;
 		start_s <= '1';
 		WAIT FOR 2 * TIME_DELTA;

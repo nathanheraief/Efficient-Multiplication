@@ -29,13 +29,13 @@ ENTITY evaluator IS
 		start  : IN std_logic;                              -- Active high signal used to specify that inputs are valid (always required)
 		done   : OUT std_logic;                             -- Active high signal used to notify the CPU that result is valid (required for variable multi-cycle)
 		dataa  : IN std_logic_vector(5 * (N) - 1 DOWNTO 0); -- Operand A (always required)
-		result : OUT std_logic_vector((N) * 7 - 1 DOWNTO 0); -- result (always required)
+		result : OUT std_logic_vector((N) * 8 - 1 DOWNTO 0); -- result (always required)
 		p    : IN std_logic_vector(N - 2 DOWNTO 0)
 	);
 END evaluator;
 ARCHITECTURE rtl OF evaluator IS
 
-	TYPE STATE_T IS (INIT, PRECALCUL, TEMP, TEMP2, CALCUL, STORAGE, FINISH);
+	TYPE STATE_T IS (INIT, PRECALCUL, TEMP, TEMP2, CALCUL, STORAGE, FINISH ,VERIFY);
 
 	SIGNAL current_s     : STATE_T;
 	SIGNAL busy          : std_logic := '0';
@@ -52,6 +52,17 @@ ARCHITECTURE rtl OF evaluator IS
 	SIGNAL result_s      : std_logic_vector(NB_ADD * (N + 1) - 1 DOWNTO 0);
 	SIGNAL store         : std_logic_vector((N) - 1 DOWNTO 0);
 	SIGNAL bigstore      : std_logic_vector(5 * (N) + (N) - 1 DOWNTO 0);
+	SIGNAL result_copy   : std_logic_vector((N) * 8 - 1 DOWNTO 0);
+
+	
+	SIGNAL res0         : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+	SIGNAL res1         : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+	SIGNAL res2         : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+	SIGNAL res3         : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+	SIGNAL res4         : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+	SIGNAL res5         : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+	SIGNAL res6         : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+	SIGNAL res7         : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
 
 	COMPONENT Omura_Optimized
 		GENERIC (
@@ -102,10 +113,10 @@ BEGIN
 			start_s       <= (OTHERS => '0');
 			dataa_s       <= (OTHERS => '0');
 			datab_s       <= (OTHERS => '0');
-			p_i_s         <= (OTHERS => '0');
 			sub_i_s       <= (OTHERS => '0');
 			busy          <= '0';
 			result        <= (OTHERS => '0');
+			result_copy        <= (OTHERS => '0');
 			store         <= (OTHERS => '0'); 
 			bigstore      <= (OTHERS => '0'); 
 			done          <= '0';
@@ -291,9 +302,21 @@ BEGIN
 					END IF;
 
 				WHEN FINISH =>
-					result    <= result_s(1 * (N) - 1 DOWNTO 0) & bigstore;
+					result    <= result_s(1 * (N) - 1 DOWNTO 0) & bigstore & dataa( N - 1 DOWNTO 0);
+					result_copy 	<= result_s(1 * (N) - 1 DOWNTO 0) & bigstore & dataa( N - 1 DOWNTO 0);
 					done      <= '1';
-					current_s <= INIT;
+					current_s <= VERIFY;
+
+				WHEN VERIFY =>
+					res7 <= result_copy(7 * (N) + (N) - 1 DOWNTO 7 * (N));
+					res6 <= result_copy(6 * (N) + (N) - 1 DOWNTO 6 * (N));
+					res5 <= result_copy(5 * (N) + (N) - 1 DOWNTO 5 * (N));
+					res4 <= result_copy(4 * (N) + (N) - 1 DOWNTO 4 * (N));
+					res3 <= result_copy(3 * (N) + (N) - 1 DOWNTO 3 * (N));
+					res2 <= result_copy(2 * (N) + (N) - 1 DOWNTO 2 * (N));
+					res1 <= result_copy(1 * (N) + (N) - 1 DOWNTO 1 * (N));
+					res0 <= result_copy(0 * (N) + (N) - 1 DOWNTO 0);
+					current_s <= init;
 
 			END CASE;
 		END IF;
