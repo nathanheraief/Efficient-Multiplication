@@ -33,10 +33,19 @@ ARCHITECTURE arch OF Product_Evaluator_tb IS
 	SIGNAL clk_en_s     : std_logic;
 	SIGNAL start_s      : std_logic;
 	SIGNAL done_s       : std_logic;
-	SIGNAL dataa_s      : std_logic_vector(5 * N_WIDTH - 1 DOWNTO 0);
-	SIGNAL datab_s      : std_logic_vector(5 * N_WIDTH - 1 DOWNTO 0);
+	SIGNAL dataa_s      : std_logic_vector(N_COEFF * N_WIDTH - 1 DOWNTO 0);
+	SIGNAL datab_s      : std_logic_vector(N_COEFF * N_WIDTH - 1 DOWNTO 0);
 	SIGNAL result_s     : STD_LOGIC_vector(N_COEFF * N_WIDTH - 1 DOWNTO 0);
 	SIGNAL p_i_s        : STD_LOGIC_Vector(N_WIDTH - 2 DOWNTO 0);
+
+	-- SIGNAL res0         : STD_LOGIC_VECTOR(N_WIDTH - 1 DOWNTO 0);
+	-- SIGNAL res1         : STD_LOGIC_VECTOR(N_WIDTH - 1 DOWNTO 0);
+	-- SIGNAL res2         : STD_LOGIC_VECTOR(N_WIDTH - 1 DOWNTO 0);
+	-- SIGNAL res3         : STD_LOGIC_VECTOR(N_WIDTH - 1 DOWNTO 0);
+	-- SIGNAL res4         : STD_LOGIC_VECTOR(N_WIDTH - 1 DOWNTO 0);
+	-- SIGNAL res5         : STD_LOGIC_VECTOR(N_WIDTH - 1 DOWNTO 0);
+	-- SIGNAL res6         : STD_LOGIC_VECTOR(N_WIDTH - 1 DOWNTO 0);
+	-- SIGNAL res7         : STD_LOGIC_VECTOR(N_WIDTH - 1 DOWNTO 0);
 
 	COMPONENT Product_Evaluator
     GENERIC (
@@ -89,14 +98,14 @@ BEGIN
 		p_i_s <= (OTHERS => '0');
 		WAIT FOR TIME_DELTA;
     -- X4 + X3 + X2 + X1 + 1
-		dataa_s(0)   <= '1';
-		dataa_s(103) <= '1';
+		dataa_s(2 DOWNTO 0)   <= "101";
+		dataa_s((N_WIDTH*2 + 4) DOWNTO N_WIDTH*2) <= "11111";
 		dataa_s(206) <= '1';
 		dataa_s(309) <= '1';
 		dataa_s(412) <= '1';
     -- X4 + X3 + X2 + X1 + 2
 		datab_s(1)   <= '1';
-		datab_s(103) <= '1';
+		dataa_s((N_WIDTH*2 + 4) DOWNTO N_WIDTH*2) <= "11111";
 		datab_s(206) <= '1';
 		datab_s(309) <= '1';
 		datab_s(412) <= '1';
