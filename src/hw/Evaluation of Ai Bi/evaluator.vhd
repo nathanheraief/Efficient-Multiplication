@@ -5,7 +5,7 @@
 -- File : evaluator.vhd
 -- Author : Heraief Nathan
 -- Created : 18 Feb 2019
--- Last update: 18 Feb 2019
+-- Last update: 28 Mar 2019
 -------------------------------------------------------------------------------
 -- Description: Evaluation of A(X) and B(X) on Alpha
 --
@@ -23,47 +23,37 @@ ENTITY evaluator IS
 	);
 	PORT (
 		-- Required by CPU
-		clk    : IN std_logic;                              -- CPU system clock (always required)
-		reset  : IN std_logic;                              -- CPU master asynchronous active high reset (always required)
-		clk_en : IN std_logic;                              -- Clock-qualifier (always required)
-		start  : IN std_logic;                              -- Active high signal used to specify that inputs are valid (always required)
-		done   : OUT std_logic;                             -- Active high signal used to notify the CPU that result is valid (required for variable multi-cycle)
-		dataa  : IN std_logic_vector(5 * (N) - 1 DOWNTO 0); -- Operand A (always required)
+		clk    : IN std_logic;                               -- CPU system clock (always required)
+		reset  : IN std_logic;                               -- CPU master asynchronous active high reset (always required)
+		clk_en : IN std_logic;                               -- Clock-qualifier (always required)
+		start  : IN std_logic;                               -- Active high signal used to specify that inputs are valid (always required)
+		done   : OUT std_logic;                              -- Active high signal used to notify the CPU that result is valid (required for variable multi-cycle)
+		dataa  : IN std_logic_vector(5 * (N) - 1 DOWNTO 0);  -- Operand A (always required)
 		result : OUT std_logic_vector((N) * 8 - 1 DOWNTO 0); -- result (always required)
-		p    : IN std_logic_vector(N - 2 DOWNTO 0)
+		p      : IN std_logic_vector(N - 2 DOWNTO 0)
 	);
 END evaluator;
 ARCHITECTURE rtl OF evaluator IS
 
-	TYPE STATE_T IS (INIT, PRECALCUL, TEMP, TEMP2, CALCUL, STORAGE, FINISH ,VERIFY);
+	TYPE STATE_T IS (INIT, PRECALCUL, TEMP, TEMP2, CALCUL, STORAGE, FINISH, VERIFY);
 
-	SIGNAL current_s     : STATE_T;
-	SIGNAL busy          : std_logic := '0';
-	SIGNAL COUNTER       : INTEGER   := 0;
+	--signals for FSM
+	SIGNAL current_s : STATE_T;
+	SIGNAL busy      : std_logic := '0';
+	SIGNAL COUNTER   : INTEGER   := 0;
 
-	SIGNAL start_s       : std_logic_vector(NB_ADD - 1 DOWNTO 0);
-	SIGNAL clk_s         : std_logic;
-	SIGNAL reset_s       : std_logic;
-	SIGNAL clk_en_s      : std_logic;
-	SIGNAL done_s        : std_logic_vector(NB_ADD - 1 DOWNTO 0);
-	SIGNAL sub_i_s       : std_logic_vector(NB_ADD - 1 DOWNTO 0);
-	SIGNAL dataa_s       : std_logic_vector(NB_ADD * (N) - 1 DOWNTO 0);
-	SIGNAL datab_s       : std_logic_vector(NB_ADD * (N) - 1DOWNTO 0);
-	SIGNAL result_s      : std_logic_vector(NB_ADD * (N + 1) - 1 DOWNTO 0);
-	SIGNAL store         : std_logic_vector((N) - 1 DOWNTO 0);
-	SIGNAL bigstore      : std_logic_vector(5 * (N) + (N) - 1 DOWNTO 0);
-	SIGNAL result_copy   : std_logic_vector((N) * 8 - 1 DOWNTO 0);
-
-	
-	SIGNAL res0         : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
-	SIGNAL res1         : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
-	SIGNAL res2         : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
-	SIGNAL res3         : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
-	SIGNAL res4         : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
-	SIGNAL res5         : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
-	SIGNAL res6         : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
-	SIGNAL res7         : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
-
+	--signals for adders
+	SIGNAL start_s   : std_logic_vector(NB_ADD - 1 DOWNTO 0);
+	SIGNAL clk_s     : std_logic;
+	SIGNAL reset_s   : std_logic;
+	SIGNAL clk_en_s  : std_logic;
+	SIGNAL done_s    : std_logic_vector(NB_ADD - 1 DOWNTO 0);
+	SIGNAL sub_i_s   : std_logic_vector(NB_ADD - 1 DOWNTO 0);
+	SIGNAL dataa_s   : std_logic_vector(NB_ADD * (N) - 1 DOWNTO 0);
+	SIGNAL datab_s   : std_logic_vector(NB_ADD * (N) - 1DOWNTO 0);
+	SIGNAL result_s  : std_logic_vector(NB_ADD * (N + 1) - 1 DOWNTO 0);
+	SIGNAL store     : std_logic_vector((N) - 1 DOWNTO 0);
+	SIGNAL bigstore  : std_logic_vector(5 * (N) + (N) - 1 DOWNTO 0);
 	COMPONENT Omura_Optimized
 		GENERIC (
 			N : INTEGER := 103
@@ -110,17 +100,16 @@ BEGIN
 	BEGIN
 		IF (reset = '1') THEN
 
-			start_s       <= (OTHERS => '0');
-			dataa_s       <= (OTHERS => '0');
-			datab_s       <= (OTHERS => '0');
-			sub_i_s       <= (OTHERS => '0');
-			busy          <= '0';
-			result        <= (OTHERS => '0');
-			result_copy        <= (OTHERS => '0');
-			store         <= (OTHERS => '0'); 
-			bigstore      <= (OTHERS => '0'); 
-			done          <= '0';
-			current_s     <= Init;
+			start_s   <= (OTHERS => '0');
+			dataa_s   <= (OTHERS => '0');
+			datab_s   <= (OTHERS => '0');
+			sub_i_s   <= (OTHERS => '0');
+			busy      <= '0';
+			result    <= (OTHERS => '0');
+			store     <= (OTHERS => '0');
+			bigstore  <= (OTHERS => '0');
+			done      <= '0';
+			current_s <= Init;
 
 		ELSIF (rising_edge(clk)) THEN
 
@@ -137,11 +126,12 @@ BEGIN
 
 				WHEN TEMP          =>
 					start_s <= (OTHERS => '0');
-					IF (done_s = "111111" OR done_s = "010101") THEN
+					IF (done_s = "111111" OR done_s = "010101") THEN --check if adders are done
 						IF (counter = 2) THEN
 							current_s <= STORAGE;
 							counter   <= 0;
 						ELSE
+							--reset inputs
 							sub_i_s   <= (OTHERS => '0');
 							dataa_s   <= (OTHERS => '0');
 							datab_s   <= (OTHERS => '0');
@@ -154,7 +144,7 @@ BEGIN
 
 				WHEN TEMP2         =>
 					start_s <= (OTHERS => '0');
-					IF (done_s = "000111" OR done_s = "000001") THEN
+					IF (done_s = "000111" OR done_s = "000001") THEN--check if adders are done
 						IF (counter = 2) THEN
 							current_s <= FINISH;
 							counter   <= 0;
@@ -169,6 +159,7 @@ BEGIN
 						current_s <= TEMP2;
 					END IF;
 				WHEN PRECALCUL =>
+					--First stage of calcul
 					IF (counter = 0) THEN
 						-- Adder 0
 						dataa_s(0 * (N) + N - 1 DOWNTO 0)           <= dataa(0 * (N) + N - 1 DOWNTO 0);           --a0
@@ -194,6 +185,7 @@ BEGIN
 					END IF;
 
 					IF (counter = 1) THEN
+						--Second  stage of calcul
 						-- Adder 0
 						dataa_s(0 * (N) + N - 1 DOWNTO 0)           <= result_s(0 * (N + 1) + (N + 1) - 1 - 1 DOWNTO 0);           -- c
 						datab_s(0 * (N) + N - 1 DOWNTO 0)           <= dataa(4 * (N) + N - 1 DOWNTO 4 * (N));                      --a4
@@ -222,6 +214,7 @@ BEGIN
 					END IF;
 
 					IF (counter = 2) THEN
+						--Third stage of calcul
 						-- Adder 0
 						dataa_s(0 * (N) + N - 1 DOWNTO 0)       <= result_s(1 * (N) - 1 DOWNTO 0);                             -- sp1
 						datab_s(0 * (N) + N - 1 DOWNTO 0)       <= result_s(1 * (N + 1) + (N + 1) - 1 - 1 DOWNTO 1 * (N + 1)); -- si1
@@ -251,28 +244,29 @@ BEGIN
 					END IF;
 
 				WHEN STORAGE =>
+					--store first values before computing last one
 					bigstore <= result_s(5 * (N + 1) + (N + 1) - 1 - 1 DOWNTO 5 * (N + 1)) &
-						        result_s(4 * (N + 1) + (N + 1) - 1 - 1 DOWNTO 4 * (N + 1)) &
-						        result_s(3 * (N + 1) + (N + 1) - 1 - 1 DOWNTO 3 * (N + 1)) &
-						        result_s(2 * (N + 1) + (N + 1) - 1 - 1 DOWNTO 2 * (N + 1)) &
-						        result_s(1 * (N + 1) + (N + 1) - 1 - 1 DOWNTO 1 * (N + 1)) &
-						        result_s(0 * (N + 1) + (N + 1) - 1 - 1 DOWNTO 0);
-						        
-						     sub_i_s   <= (OTHERS => '0');
-							dataa_s   <= (OTHERS => '0');
-							datab_s   <= (OTHERS => '0');
+						result_s(4 * (N + 1) + (N + 1) - 1 - 1 DOWNTO 4 * (N + 1)) &
+						result_s(3 * (N + 1) + (N + 1) - 1 - 1 DOWNTO 3 * (N + 1)) &
+						result_s(2 * (N + 1) + (N + 1) - 1 - 1 DOWNTO 2 * (N + 1)) &
+						result_s(1 * (N + 1) + (N + 1) - 1 - 1 DOWNTO 1 * (N + 1)) &
+						result_s(0 * (N + 1) + (N + 1) - 1 - 1 DOWNTO 0);
+
+					sub_i_s   <= (OTHERS => '0');
+					dataa_s   <= (OTHERS => '0');
+					datab_s   <= (OTHERS => '0');
 					current_s <= CALCUL;
 				WHEN CALCUL =>
 
 					IF (counter = 0) THEN
-						-- Adder 0                                
+						-- Adder 0
 						dataa_s(0 * (N) + N - 1 DOWNTO 0)           <= result_s(0 * (N + 1) + (N + 1) - 1 - 1 DOWNTO 0); --A(1)
-						datab_s(0 * (N) + N - 1 DOWNTO 0)           <= '0'& store((N) - 1 DOWNTO 1);                                            --2^-1 Si4
+						datab_s(0 * (N) + N - 1 DOWNTO 0)           <= '0' & store((N) - 1 DOWNTO 1);                    --2^-1 Si4
 						-- Adder 1
 						dataa_s(1 * (N) + N - 1 DOWNTO 1 * (N) + 3) <= dataa(2 * (N) + N - 1 - 3 DOWNTO 2 * (N));        --2^3 a2
 						datab_s(1 * (N) + N - 1 DOWNTO 1 * (N) + 2) <= dataa(3 * (N) + N - 1 - 2 DOWNTO 3 * (N));        -- - 2^2 a3
 						--Adder 2
-						dataa_s(2 * (N) + N - 1 DOWNTO 2 * (N) + 6) <= dataa(4 * (N) + N - 1 - 6 DOWNTO 4*(N));              --2^6 a4
+						dataa_s(2 * (N) + N - 1 DOWNTO 2 * (N) + 6) <= dataa(4 * (N) + N - 1 - 6 DOWNTO 4 * (N));        --2^6 a4
 						datab_s(2 * (N) + N - 1 DOWNTO 2 * (N) + 4) <= dataa(4 * (N) + N - 1 - 4 DOWNTO 4 * (N));        --a4*2^4
 						sub_i_s(1)                                  <= '1';
 						start_s(0)                                  <= '1';
@@ -284,8 +278,8 @@ BEGIN
 
 					IF (counter = 1) THEN
 
-						-- Adder 0                                
-						dataa_s(0 * (N) + N - 1 DOWNTO 0) <= result_s(1 * (N) - 1 DOWNTO 0);                             -- r1  
+						-- Adder 0
+						dataa_s(0 * (N) + N - 1 DOWNTO 0) <= result_s(1 * (N) - 1 DOWNTO 0);                             -- r1
 						datab_s(0 * (N) + N - 1 DOWNTO 0) <= result_s(1 * (N + 1) + (N + 1) - 1 - 1 DOWNTO 1 * (N + 1)); -- r2
 
 						start_s(0)                        <= '1';
@@ -293,7 +287,7 @@ BEGIN
 					END IF;
 
 					IF (counter = 2) THEN
-						-- Adder 0                                
+						-- Adder 0
 						dataa_s(0 * (N) + N - 1 DOWNTO 0) <= result_s(1 * (N) - 1 DOWNTO 0);                             -- r1
 						datab_s(0 * (N) + N - 1 DOWNTO 0) <= result_s(2 * (N + 1) + (N + 1) - 1 - 1 DOWNTO 2 * (N + 1)); -- r3
 
@@ -302,21 +296,9 @@ BEGIN
 					END IF;
 
 				WHEN FINISH =>
-					result    <= result_s(1 * (N) - 1 DOWNTO 0) & bigstore & dataa( N - 1 DOWNTO 0);
-					result_copy 	<= result_s(1 * (N) - 1 DOWNTO 0) & bigstore & dataa( N - 1 DOWNTO 0);
+					result    <= result_s(1 * (N) - 1 DOWNTO 0) & bigstore & dataa(N - 1 DOWNTO 0);
 					done      <= '1';
-					current_s <= VERIFY;
-
-				WHEN VERIFY =>
-					res7 <= result_copy(7 * (N) + (N) - 1 DOWNTO 7 * (N));
-					res6 <= result_copy(6 * (N) + (N) - 1 DOWNTO 6 * (N));
-					res5 <= result_copy(5 * (N) + (N) - 1 DOWNTO 5 * (N));
-					res4 <= result_copy(4 * (N) + (N) - 1 DOWNTO 4 * (N));
-					res3 <= result_copy(3 * (N) + (N) - 1 DOWNTO 3 * (N));
-					res2 <= result_copy(2 * (N) + (N) - 1 DOWNTO 2 * (N));
-					res1 <= result_copy(1 * (N) + (N) - 1 DOWNTO 1 * (N));
-					res0 <= result_copy(0 * (N) + (N) - 1 DOWNTO 0);
-					current_s <= init;
+					current_s <= INIT;
 
 			END CASE;
 		END IF;

@@ -6,7 +6,7 @@
 -- File : Omura_Optimized_tb.vhd
 -- Author : Heraief Nathan
 -- Created : 18 Feb 2019
--- Last update: 12 Mar 2019
+-- Last update: 28 Mar 2019
 -------------------------------------------------------------------------------
 -- Description: Testbench for Omura_Optimized_tb
 --
@@ -73,7 +73,7 @@ BEGIN
 		p_i    => p_i_s
 	);
 
-	clk_s <= NOT clk_s AFTER TIME_DELTA;
+	clk_s <= NOT clk_s AFTER TIME_DELTA; --clock
 
 	do_check_out_result : PROCESS
 	BEGIN
@@ -86,9 +86,9 @@ BEGIN
 		p_i_s 	<= (OTHERS => '0');
 		WAIT FOR TIME_DELTA;
 
-		dataa_s(N_WIDTH) <= '1';
-		datab_s(0) <= '0';
-		p_i_s(8 DOWNTO 0) <= "100100101";		
+		dataa_s(N_WIDTH) <= '1'; --set input
+		datab_s(0) <= '0'; --set input
+		p_i_s(8 DOWNTO 0) <= "100100101";
 		sub_i_s <= '0';
 
 		WAIT FOR TIME_DELTA;

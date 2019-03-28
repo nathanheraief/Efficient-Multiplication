@@ -5,7 +5,7 @@
 -- File : evaluator_tb.vhd
 -- Author : Heraief Nathan
 -- Created : 11 Mar 2019
--- Last update: 12 Mar 2019
+-- Last update: 28 Mar 2019
 -------------------------------------------------------------------------------
 -- Description: Testbench for evaluator
 
@@ -87,13 +87,13 @@ BEGIN
 		reset_s <= '0';
 		WAIT FOR TIME_DELTA;
 		dataa_s <= (OTHERS => '0');
-		p_i_s <= (OTHERS => '0');
+		p_i_s   <= (OTHERS => '0');
 		WAIT FOR TIME_DELTA;
-		dataa_s(0)   <= '1';
-		dataa_s(103) <= '1';
-		dataa_s(206) <= '1';
-		dataa_s(309) <= '1';
-		dataa_s(412) <= '1';
+		dataa_s(0)        <= '1';
+		dataa_s(103)      <= '1';
+		dataa_s(206)      <= '1';
+		dataa_s(309)      <= '1';
+		dataa_s(412)      <= '1';
 		p_i_s(8 DOWNTO 0) <= "100100101";
 
 		WAIT FOR TIME_DELTA;
@@ -101,6 +101,7 @@ BEGIN
 		WAIT FOR 2 * TIME_DELTA;
 		start_s <= '0';
 		WAIT FOR 100 * TIME_DELTA;
+		--allows to check each value of outputs
 		res7 <= result_s(7 * (N_WIDTH) + (N_WIDTH) - 1 DOWNTO 7 * (N_WIDTH));
 		res6 <= result_s(6 * (N_WIDTH) + (N_WIDTH) - 1 DOWNTO 6 * (N_WIDTH));
 		res5 <= result_s(5 * (N_WIDTH) + (N_WIDTH) - 1 DOWNTO 5 * (N_WIDTH));

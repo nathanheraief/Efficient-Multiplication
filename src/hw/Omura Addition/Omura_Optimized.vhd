@@ -5,7 +5,7 @@
 -- File : Omura.vhd
 -- Author : Heraief Nathan
 -- Created : 18 Feb 2019
--- Last update: 18 Feb 2019
+-- Last update: 28 Mar 2019
 -------------------------------------------------------------------------------
 -- Description: Implementatio of the Omura Methode to compute modular Addition
 --
@@ -32,13 +32,13 @@ ENTITY Omura_Optimized IS
 		result : OUT std_logic_vector(N + 1 DOWNTO 0); -- result (always required)
 
 		--Custom I/O
-		sub_i : IN std_logic;
-		p_i   : IN std_logic_vector(N - 1 DOWNTO 0)
+		sub_i  : IN std_logic;
+		p_i    : IN std_logic_vector(N - 1 DOWNTO 0)
 	);
 END Omura_Optimized;
 
 ARCHITECTURE rtl OF Omura_Optimized IS
-	TYPE STATE_T IS (INIT, PREPROCESS, CALCUL, MODULO, RESCALE, WRITE); --Vous pouvez rajouter des etats ici.
+	TYPE STATE_T IS (INIT, PREPROCESS, CALCUL, MODULO, RESCALE, WRITE);
 
 	SIGNAL current_s     : STATE_T;
 	SIGNAL dataa_p       : STD_LOGIC_VECTOR(N + 1 DOWNTO 0);
@@ -48,14 +48,11 @@ ARCHITECTURE rtl OF Omura_Optimized IS
 	SIGNAL to_be_written : STD_LOGIC_VECTOR(N + 1 DOWNTO 0);
 	SIGNAL S             : STD_LOGIC_VECTOR(N + 1 DOWNTO 0);
 	SIGNAL Sp            : STD_LOGIC_VECTOR(N + 1 DOWNTO 0);
-	SIGNAL p_s            : STD_LOGIC_VECTOR(N +1  DOWNTO 0);
-	SIGNAL np_s          : STD_LOGIC_VECTOR(N +1  DOWNTO 0);
+	SIGNAL p_s           : STD_LOGIC_VECTOR(N + 1 DOWNTO 0);
+	SIGNAL np_s          : STD_LOGIC_VECTOR(N + 1 DOWNTO 0);
 	SIGNAL m             : STD_LOGIC_VECTOR(N + 1 DOWNTO 0);
-  SIGNAL powerN        : STD_LOGIC_VECTOR(N + 1 DOWNTO 0);
+	SIGNAL powerN        : STD_LOGIC_VECTOR(N + 1 DOWNTO 0);
 	SIGNAL busy          : STD_LOGIC;
-	SIGNAL T1            : STD_LOGIC;
-	SIGNAL T2            : STD_LOGIC;
-	
 
 BEGIN
 
@@ -70,15 +67,13 @@ BEGIN
 			S             <= (OTHERS => '0');
 			Sp            <= (OTHERS => '0');
 			p_s           <= (OTHERS => '0');
-			np_s           <= (OTHERS => '0');
-			m             <= (OTHERS => '0');			
+			np_s          <= (OTHERS => '0');
+			m             <= (OTHERS => '0');
 			busy          <= '0';
 			result        <= (OTHERS => '0');
 			done          <= '0';
 			powerN        <= (OTHERS => '0');
 			current_s     <= Init;
-			
-
 		ELSIF (rising_edge(clk)) THEN
 
 			CASE current_s IS
@@ -86,12 +81,12 @@ BEGIN
 				WHEN INIT =>
 					IF (start = '1' AND busy = '0') THEN
 						done      <= '0';
-						m	      <= (OTHERS => '0');
-						dataa_p   <= (N + 1 DOWNTO dataa'length => '0') & dataa;
-						datab_p   <= (N + 1 DOWNTO datab'length => '0') & datab;
-						p_s       <= "00" & p_i;
-						np_s      <= not ("00"&p_i) +1;
-						powerN(N)    <= '1' ;
+						m         <= (OTHERS                    => '0');
+						dataa_p   <= (N + 1 DOWNTO dataa'length => '0') & dataa; --save entry signal and add 0 for signed
+						datab_p   <= (N + 1 DOWNTO datab'length => '0') & datab; --save entry signal and add 0 for signed
+						p_s       <= "00" & p_i; -- padding
+						np_s      <= NOT ("00" & p_i) + 1; -- minus p_s
+						powerN(N) <= '1'; -- 2**n
 						current_s <= PREPROCESS;
 					ELSE
 						done      <= '0';
@@ -99,9 +94,9 @@ BEGIN
 					END IF;
 
 				WHEN PREPROCESS =>
-				  m(n)      <='1';  
-					IF (sub_i = '1') THEN
-						datab_f   <= NOT datab_p + 1;
+					m(n) <= '1';
+					IF (sub_i = '1') THEN --soustrasction
+						datab_f   <= NOT datab_p + 1; -- new B = -B
 						dataa_f   <= dataa_p;
 						current_s <= CALCUL;
 					ELSE
@@ -111,17 +106,17 @@ BEGIN
 					END IF;
 
 				WHEN CALCUL =>
-					m             <= m  +np_s;
-					S                  <= dataa_f + datab_f;
-					current_s          <= MODULO;
-					
-				WHEN MODULO =>
-				    Sp <= S + m;
-				    current_s          <= RESCALE;
+					m         <= m + np_s; -- compute modulo
+					S         <= dataa_f + datab_f; -- First add
+					current_s <= MODULO;
 
-				WHEN RESCALE =>
+				WHEN MODULO =>
+					Sp        <= S + m; --Second Add
+					current_s <= RESCALE;
+
+				WHEN RESCALE => --Compare state
 					IF (S(N + 1) = '1') THEN
-						to_be_written <= S + (p_s(N DOWNTO 0)&'0');
+						to_be_written <= S + (p_s(N DOWNTO 0) & '0');
 						current_s     <= WRITE;
 					ELSE
 						IF (Sp(N) = '1') THEN
@@ -132,6 +127,7 @@ BEGIN
 							current_s     <= WRITE;
 						END IF;
 					END IF;
+
 				WHEN WRITE =>
 					result    <= to_be_written;
 					Done      <= '1';
