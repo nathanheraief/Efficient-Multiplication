@@ -18,7 +18,7 @@ USE IEEE.std_logic_unsigned.ALL;
 ------------------------------------------------------------------------------
 ENTITY Divider_Three IS
 	GENERIC (
-		N : INTEGER := 577
+		N : INTEGER := 4
 	);
 	PORT (
 		-- Required by CPU

@@ -71,7 +71,7 @@ BEGIN
 		WAIT FOR TIME_DELTA;
 		data_s <= (OTHERS => '0');
 		WAIT FOR TIME_DELTA;
-		data_s <= "0000";
+		data_s <= "0110";
 
 		WAIT FOR TIME_DELTA;
 		start_s <= '1';

@@ -50,11 +50,11 @@ ARCHITECTURE rtl OF Montgomery_Multiplication IS
 			done   : OUT std_logic;                        -- Active high signal used to notify the CPU that result is valid (required for variable multi-cycle)
 			dataa  : IN std_logic_vector(N DOWNTO 0);      -- Operand A (always required)
 			datab  : IN std_logic_vector(N DOWNTO 0);      -- Operand B (always required)
-			result : OUT std_logic_vector(N DOWNTO 0); -- result (always required)
+			result : OUT std_logic_vector(N + 1 DOWNTO 0); -- result (always required)
 
 			--Custom I/O
 			sub_i  : IN std_logic;
-			p_i    : IN std_logic_vector(N DOWNTO 0)
+			p_i    : IN std_logic_vector(N - 1 DOWNTO 0)
 		);
 
 	END COMPONENT;
