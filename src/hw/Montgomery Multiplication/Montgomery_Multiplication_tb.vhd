@@ -23,7 +23,7 @@ END Montgomery_Multiplication_tb;
 
 ARCHITECTURE arch OF Montgomery_Multiplication_tb IS
 
-	CONSTANT N_WIDTH    : INTEGER   := 4;
+	CONSTANT N_WIDTH    : INTEGER   := 256;
 	CONSTANT TIME_DELTA : TIME      := 6 ns;
 
 	SIGNAL clk_s        : std_logic := '0';
@@ -39,7 +39,7 @@ ARCHITECTURE arch OF Montgomery_Multiplication_tb IS
 
 	COMPONENT Montgomery_Multiplication
 		GENERIC (
-			N : INTEGER := 15
+			N : INTEGER := 256
 		);
 		PORT (
 			-- Required by CPU
@@ -87,9 +87,9 @@ BEGIN
 		p_i_s		<= (OTHERS => '0');
 
 		WAIT FOR TIME_DELTA;
-		datab_s(N_WIDTH DOWNTO 0) 		<= "00101"; --7
-		dataa_s(N_WIDTH DOWNTO 0) 		<= "00011"; --5
-		p_i_s(N_WIDTH DOWNTO 0)   <= "01011";  --11
+		datab_s(7 DOWNTO 0) 		<= "01000001"; --30
+		dataa_s(7 DOWNTO 0) 		<= "00011110"; --65
+		p_i_s(8 DOWNTO 0) 			<= "100100101"; -- 293
 
 		WAIT FOR TIME_DELTA;
 		start_s <= '1';

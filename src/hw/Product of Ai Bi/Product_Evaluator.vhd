@@ -51,7 +51,7 @@ ARCHITECTURE rtl OF Product_Evaluator IS
 	SIGNAL carry_s        : STD_LOGIC;
   SIGNAL result_s       : STD_LOGIC_VECTOR(N * N_COEFF - 1 DOWNTO 0);
   SIGNAL p_s            : STD_LOGIC_VECTOR(N - 2 DOWNTO 0);
-  SIGNAL p_big_s            : STD_LOGIC_VECTOR(N - 1 DOWNTO 0);
+  SIGNAL p_big_s            : STD_LOGIC_VECTOR(N DOWNTO 0);
   SIGNAL done_eva_s     : STD_LOGIC_VECTOR(1 DOWNTO 0);    
   SIGNAL done_prod_s    : STD_LOGIC_VECTOR(N_COEFF DOWNTO 0);    
 	

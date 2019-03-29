@@ -60,8 +60,8 @@ ARCHITECTURE arch OF Product_Evaluator_tb IS
       clk_en : IN std_logic;                         -- Clock-qualifier (always required)
       start  : IN std_logic;                         -- Active high signal used to specify that inputs are valid (always required)
       done   : OUT std_logic;                        -- Active high signal used to notify the CPU that result is valid (required for variable multi-cycle)
-      dataa  : IN std_logic_vector(N * 5 - 1 DOWNTO 0);      -- Operand A (always required)
-      datab  : IN std_logic_vector(N * 5 - 1 DOWNTO 0);      -- Operand B(always required)
+      dataa  : IN std_logic_vector(N * N_COEFF - 1 DOWNTO 0);      -- Operand A (always required)
+      datab  : IN std_logic_vector(N * N_COEFF - 1 DOWNTO 0);      -- Operand B(always required)
       result : OUT std_logic_vector(N * N_COEFF - 1 DOWNTO 0); -- result (always required)
       p   : IN std_logic_vector(N - 2 DOWNTO 0)
     );

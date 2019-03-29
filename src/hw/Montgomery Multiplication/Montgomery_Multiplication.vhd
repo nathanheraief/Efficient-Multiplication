@@ -17,7 +17,7 @@ USE IEEE.std_logic_unsigned.ALL;
 ------------------------------------------------------------------------------
 ENTITY Montgomery_Multiplication IS
 	GENERIC (
-		N : INTEGER := 15
+		N : INTEGER := 256
 	);
 	PORT (
 		-- Required by CPU
@@ -59,7 +59,7 @@ ARCHITECTURE rtl OF Montgomery_Multiplication IS
 
 	END COMPONENT;
 
-	TYPE STATE_T IS (INIT, RESCALE1, MULTIPLY, CHANGE_ENTRY, PREPROCESS, CALCUL, LAUNCHADD1, LAUNCHADD2, RESCALE2, MODULO, WRITE); --Vous pouvez rajouter des etats ici.
+	TYPE STATE_T IS (INIT, RESCALE1, MULTIPLY, PREPROCESS, CALCUL, LAUNCHADD1, LAUNCHADD2, RESCALE2, MODULO, WRITE); --Vous pouvez rajouter des etats ici.
 
 	SIGNAL clk_s     : STD_LOGIC;
 	SIGNAL reset_s   : STD_LOGIC;
@@ -68,6 +68,7 @@ ARCHITECTURE rtl OF Montgomery_Multiplication IS
 	SIGNAL done_s    : STD_LOGIC;
 	SIGNAL current_s : STATE_T;
 	SIGNAL dataa_s   : STD_LOGIC_VECTOR(2 * N + 3 DOWNTO 0);
+	SIGNAL dataa_rescaled   : STD_LOGIC_VECTOR(2 * N + 3 DOWNTO 0);
 	SIGNAL datab_s   : STD_LOGIC_VECTOR(2 * N + 3 DOWNTO 0);
 	SIGNAL sub_i_s   : STD_LOGIC_VECTOR(1 DOWNTO 0);
 	SIGNAL S         : STD_LOGIC_VECTOR(2 * N + 3 DOWNTO 0);
@@ -80,8 +81,7 @@ ARCHITECTURE rtl OF Montgomery_Multiplication IS
 	SIGNAL p_i_s_iii  : STD_LOGIC_VECTOR(2 * N DOWNTO 0); --for second adder
 	SIGNAL busy      : STD_LOGIC;
 
-	SIGNAL scale		 : STD_LOGIC_VECTOR(2 * N DOWNTO 0);
-	SIGNAL scale_mod : STD_LOGIC_VECTOR(N DOWNTO 0);
+	SIGNAL scale		 : STD_LOGIC_VECTOR(N DOWNTO 0);
 
 BEGIN
 
@@ -115,6 +115,7 @@ BEGIN
 			addId := 0;
 			start_s   <= '0';
 			dataa_s   <= (OTHERS => '0');
+			dataa_rescaled   <= (OTHERS => '0');
 			datab_s   <= (OTHERS => '0');
 			sub_i_s   <= (OTHERS => '0'); -- On ne fait que des additions ici
 			p_i_s_i   <= (OTHERS => '0');
@@ -126,7 +127,6 @@ BEGIN
 			Stm       <= (OTHERS => '0');
 			busy      <= '0';
 			scale			<= (OTHERS => '0');
-			scale_mod	<= (OTHERS => '0');
 			result    <= (OTHERS => '0');
 			done      <= '0';
 			current_s <= INIT;
@@ -137,13 +137,12 @@ BEGIN
 
 				WHEN INIT =>
 					IF (start = '1' AND busy = '0') THEN
-						scale(2 * N)							<= '1';
+						scale(7 DOWNTO 0)					<= "00010001";
 						done      								<= '0';
 						dataa_s(N DOWNTO 0)   		<= dataa;
 						datab_s(N DOWNTO 0)   		<= datab;
-						p_i_s_i(N DOWNTO 0)  	<= p_i;
-						p_i_s_ii(N DOWNTO 0) 	<= p_i;
-						p_i_s_iii(N DOWNTO 0)	<= p_i;
+						p_i_s_i(N DOWNTO 0)  			<= p_i;
+						p_i_s_ii(N DOWNTO 0) 			<= p_i;
 						Stm												<= (OTHERS => '0');
 						current_s <= RESCALE1;
 					ELSE
@@ -153,16 +152,23 @@ BEGIN
 
 				
 				WHEN RESCALE1 =>
-					scale <= std_logic_vector((unsigned(scale) mod unsigned(p_i_s_iii)));
+					if(scale(count) = '1') THEN
+						t <= std_logic_vector(shift_left(unsigned(dataa_s), count));
+					ELSE
+						t <= (OTHERS => '0');
+					END IF;
 					current_s <= MULTIPLY;
 
 				WHEN MULTIPLY =>
-					scale_mod <= scale(N DOWNTO 0);
-					current_s <= CHANGE_ENTRY;
-
-				WHEN CHANGE_ENTRY =>
-					dataa_s((2 * N + 1) DOWNTO 0) <= std_logic_vector((unsigned(scale_mod) * unsigned(dataa)));
-					current_s <= PREPROCESS;
+					if(count < 8) THEN -- count < scale.bitlength
+						dataa_rescaled <= dataa_rescaled + t;
+						count := count + 1;
+						current_s <= RESCALE1;	
+					ELSE
+						dataa_s <= dataa_rescaled;
+						count := 0;
+						current_s <= PREPROCESS;
+					END IF;
 
 				WHEN PREPROCESS =>
 					IF (dataa_s(count) = '1') THEN                                       -- if Xi = 1
@@ -185,7 +191,6 @@ BEGIN
 
 				WHEN LAUNCHADD2 =>
 					Stm <= S + p_i_s_ii;
-					-- addId := 1;
 					current_s <= CALCUL;
 
 				WHEN CALCUL =>
@@ -213,7 +218,6 @@ BEGIN
 					IF (done_s = '1') THEN
 						current_s <= WRITE;
 					END IF;
-
 					
 				WHEN WRITE =>
 					result    <= modulo_s(N DOWNTO 0);
